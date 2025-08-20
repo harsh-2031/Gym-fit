@@ -2,6 +2,27 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// --- MUI Imports ---
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+} from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+
 const TrainerCreateWorkoutPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -27,23 +48,24 @@ const TrainerCreateWorkoutPage = () => {
   }, []);
 
   const handleAddExercise = () => {
-    if (!selectedExercise || !sets || !reps) {
-      alert("Please select an exercise and fill in sets and reps.");
-      return;
-    }
+    if (!selectedExercise || !sets || !reps) return;
     const exerciseToAdd = allExercises.find(
       (ex) => ex._id === selectedExercise
     );
     const newExercise = {
       exercise: exerciseToAdd._id,
       name: exerciseToAdd.name,
-      sets: parseInt(sets, 10),
+      sets: parseInt(sets),
       reps,
     };
     setExercises([...exercises, newExercise]);
     setSelectedExercise("");
     setSets("");
     setReps("");
+  };
+
+  const handleRemoveExercise = (indexToRemove) => {
+    setExercises(exercises.filter((_, index) => index !== indexToRemove));
   };
 
   const handleSubmit = async (e) => {
@@ -60,7 +82,6 @@ const TrainerCreateWorkoutPage = () => {
           reps,
         })),
       };
-      // Post to the new trainer-specific endpoint
       await axios.post(
         "http://localhost:5000/api/trainers/workouts",
         workoutData,
@@ -73,67 +94,120 @@ const TrainerCreateWorkoutPage = () => {
   };
 
   return (
-    <div>
-      <h1>Create New Workout Template</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Template Name:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Description:</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-        <hr />
-        <h3>Add Exercises</h3>
-        <div>
-          <select
-            value={selectedExercise}
-            onChange={(e) => setSelectedExercise(e.target.value)}
-          >
-            <option value="">-- Select an Exercise --</option>
-            {allExercises.map((ex) => (
-              <option key={ex._id} value={ex._id}>
-                {ex.name}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            placeholder="Sets"
-            value={sets}
-            onChange={(e) => setSets(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Reps (e.g., 8-12)"
-            value={reps}
-            onChange={(e) => setReps(e.target.value)}
-          />
-          <button type="button" onClick={handleAddExercise}>
-            Add Exercise
-          </button>
-        </div>
-        <h4>Current Exercises in Template:</h4>
-        <ul>
-          {exercises.map((ex, index) => (
-            <li key={index}>
-              {ex.name} - {ex.sets} sets of {ex.reps} reps
-            </li>
-          ))}
-        </ul>
-        <hr />
-        <button type="submit">Save Template</button>
-      </form>
-    </div>
+    <Box component={Paper} elevation={3} sx={{ p: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Create New Workout Template
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Template Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Description (Optional)"
+              multiline
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6">Add Exercises</Typography>
+          </Grid>
+          <Grid item xs={12} sm={5}>
+            <FormControl fullWidth>
+              <InputLabel id="exercise-select-label">Exercise</InputLabel>
+              <Select
+                labelId="exercise-select-label"
+                value={selectedExercise}
+                label="Exercise"
+                onChange={(e) => setSelectedExercise(e.target.value)}
+              >
+                {allExercises.map((ex) => (
+                  <MenuItem key={ex._id} value={ex._id}>
+                    {ex.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6} sm={2}>
+            <TextField
+              fullWidth
+              label="Sets"
+              type="number"
+              value={sets}
+              onChange={(e) => setSets(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <TextField
+              fullWidth
+              label="Reps"
+              value={reps}
+              onChange={(e) => setReps(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={handleAddExercise}
+              sx={{ height: "100%" }}
+            >
+              Add
+            </Button>
+          </Grid>
+          {exercises.length > 0 && (
+            <Grid item xs={12}>
+              <Typography variant="h6" sx={{ mt: 2 }}>
+                Current Template:
+              </Typography>
+              <List dense>
+                {exercises.map((ex, index) => (
+                  <ListItem
+                    key={index}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        onClick={() => handleRemoveExercise(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText
+                      primary={ex.name}
+                      secondary={`${ex.sets} sets of ${ex.reps} reps`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Grid>
+          )}
+          <Grid item xs={12}>
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<SaveIcon />}
+              size="large"
+              fullWidth
+            >
+              Save Template
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 

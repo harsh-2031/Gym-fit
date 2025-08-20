@@ -2,19 +2,39 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// --- MUI Imports ---
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Paper,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+} from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+
 const CreateWorkoutPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [exercises, setExercises] = useState([]); // List of exercises for the new workout
+  const [exercises, setExercises] = useState([]);
 
-  const [allExercises, setAllExercises] = useState([]); // All available exercises from DB
+  const [allExercises, setAllExercises] = useState([]);
   const [selectedExercise, setSelectedExercise] = useState("");
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
 
   const navigate = useNavigate();
 
-  // Fetch all available exercises when the component mounts
   useEffect(() => {
     const fetchAllExercises = async () => {
       try {
@@ -27,7 +47,6 @@ const CreateWorkoutPage = () => {
     fetchAllExercises();
   }, []);
 
-  // Handler to add an exercise to the current workout plan
   const handleAddExercise = () => {
     if (!selectedExercise || !sets || !reps) {
       alert("Please select an exercise and fill in sets and reps.");
@@ -38,7 +57,7 @@ const CreateWorkoutPage = () => {
     );
     const newExercise = {
       exercise: exerciseToAdd._id,
-      name: exerciseToAdd.name, // To display in the list
+      name: exerciseToAdd.name,
       sets: parseInt(sets, 10),
       reps,
     };
@@ -49,14 +68,15 @@ const CreateWorkoutPage = () => {
     setReps("");
   };
 
-  // Handler for the final form submission
+  const handleRemoveExercise = (indexToRemove) => {
+    setExercises(exercises.filter((_, index) => index !== indexToRemove));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       const workoutData = {
         name,
         description,
@@ -78,75 +98,126 @@ const CreateWorkoutPage = () => {
   };
 
   return (
-    <div>
-      <h1>Create New Workout Plan</h1>
-      <form onSubmit={handleSubmit}>
-        {/* Workout Name and Description */}
-        <div>
-          <label>Workout Name:</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Description:</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+    <Box component={Paper} elevation={3} sx={{ p: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Create New Workout Plan
+      </Typography>
+      <Box component="form" onSubmit={handleSubmit}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Workout Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Description (Optional)"
+              multiline
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </Grid>
 
-        <hr style={{ margin: "20px 0" }} />
+          {/* Add Exercises Section */}
+          <Grid item xs={12}>
+            <Typography variant="h6">Add Exercises</Typography>
+          </Grid>
+          <Grid item xs={12} sm={5}>
+            <FormControl fullWidth>
+              <InputLabel id="exercise-select-label">Exercise</InputLabel>
+              <Select
+                labelId="exercise-select-label"
+                value={selectedExercise}
+                label="Exercise"
+                onChange={(e) => setSelectedExercise(e.target.value)}
+              >
+                {allExercises.map((ex) => (
+                  <MenuItem key={ex._id} value={ex._id}>
+                    {ex.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={6} sm={2}>
+            <TextField
+              fullWidth
+              label="Sets"
+              type="number"
+              value={sets}
+              onChange={(e) => setSets(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <TextField
+              fullWidth
+              label="Reps"
+              value={reps}
+              onChange={(e) => setReps(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={handleAddExercise}
+              sx={{ height: "100%" }}
+            >
+              Add
+            </Button>
+          </Grid>
 
-        {/* Section to Add Exercises */}
-        <h3>Add Exercises to Your Plan</h3>
-        <div>
-          <select
-            value={selectedExercise}
-            onChange={(e) => setSelectedExercise(e.target.value)}
-          >
-            <option value="">-- Select an Exercise --</option>
-            {allExercises.map((ex) => (
-              <option key={ex._id} value={ex._id}>
-                {ex.name}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            placeholder="Sets"
-            value={sets}
-            onChange={(e) => setSets(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Reps (e.g., 8-12)"
-            value={reps}
-            onChange={(e) => setReps(e.target.value)}
-          />
-          <button type="button" onClick={handleAddExercise}>
-            Add Exercise
-          </button>
-        </div>
+          {/* Display List of Added Exercises */}
+          {exercises.length > 0 && (
+            <Grid item xs={12}>
+              <Typography variant="h6" sx={{ mt: 2 }}>
+                Current Plan:
+              </Typography>
+              <List dense>
+                {exercises.map((ex, index) => (
+                  <ListItem
+                    key={index}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveExercise(index)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText
+                      primary={ex.name}
+                      secondary={`${ex.sets} sets of ${ex.reps} reps`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Grid>
+          )}
 
-        {/* Display List of Added Exercises */}
-        <h4>Current Workout Exercises:</h4>
-        <ul>
-          {exercises.map((ex, index) => (
-            <li key={index}>
-              {ex.name} - {ex.sets} sets of {ex.reps} reps
-            </li>
-          ))}
-        </ul>
-
-        <hr style={{ margin: "20px 0" }} />
-
-        <button type="submit">Save Workout Plan</button>
-      </form>
-    </div>
+          <Grid item xs={12}>
+            <Button
+              type="submit"
+              variant="contained"
+              startIcon={<SaveIcon />}
+              size="large"
+              fullWidth
+            >
+              Save Workout Plan
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 

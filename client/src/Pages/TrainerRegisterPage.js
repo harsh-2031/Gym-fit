@@ -2,12 +2,25 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
+// --- MUI Imports ---
+import {
+  Button,
+  TextField,
+  Container,
+  Typography,
+  Box,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
+
 const TrainerRegisterPage = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const { name, email, password } = formData;
@@ -18,64 +31,90 @@ const TrainerRegisterPage = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
-      // Note the new API endpoint for trainers
-      const res = await axios.post(
-        "http://localhost:5000/api/trainers/register",
-        formData
-      );
-      console.log(res.data);
+      await axios.post("http://localhost:5000/api/trainers/register", formData);
       alert("Registration successful! Please log in.");
-      navigate("/trainer/login"); // Redirect to trainer login page
+      navigate("/trainer/login");
     } catch (err) {
-      console.error(err.response.data);
-      alert("Registration failed. Email may already be in use.");
+      setError(err.response?.data?.message || "Registration failed.");
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Trainer Registration</h1>
-      <p>Sign up to start managing your clients.</p>
-      <form onSubmit={onSubmit}>
-        <div>
-          <input
-            type="text"
-            placeholder="Full Name"
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          Create a Trainer Account
+        </Typography>
+        <Box component="form" onSubmit={onSubmit} noValidate sx={{ mt: 1 }}>
+          {error && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="name"
+            label="Full Name"
             name="name"
+            autoComplete="name"
+            autoFocus
             value={name}
             onChange={onChange}
-            required
           />
-        </div>
-        <div>
-          <input
-            type="email"
-            placeholder="Email Address"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
             name="email"
+            autoComplete="email"
             value={email}
             onChange={onChange}
-            required
           />
-        </div>
-        <div>
-          <input
-            type="password"
-            placeholder="Password"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="new-password"
             value={password}
             onChange={onChange}
-            minLength="6"
-            required
           />
-        </div>
-        <input type="submit" value="Register as Trainer" />
-      </form>
-      <p>
-        Already have a trainer account?{" "}
-        <Link to="/trainer/login">Login Here</Link>
-      </p>
-    </div>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Sign Up as Trainer"}
+          </Button>
+          <Typography variant="body2" align="center">
+            Already have a trainer account?{" "}
+            <Link to="/trainer/login" style={{ color: "#1976d2" }}>
+              Sign In
+            </Link>
+          </Typography>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Button,
+  TextField,
+  Container,
+  Typography,
+  Box,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +17,8 @@ const RegisterPage = () => {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const { name, email, password } = formData;
@@ -18,57 +29,90 @@ const RegisterPage = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/users/register",
-        formData
-      );
-      console.log(res.data); // You can save the token to localStorage here
-      navigate("/login"); // Redirect to login page after successful registration
+      await axios.post("http://localhost:5000/api/users/register", formData);
+      alert("Registration successful! Please log in.");
+      navigate("/login");
     } catch (err) {
-      console.error(err.response.data);
-      // Here you can handle errors, e.g., show an alert
+      setError(err.response?.data?.message || "Registration failed.");
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Register</h1>
-      <form onSubmit={onSubmit}>
-        <div>
-          <input
-            type="text"
-            placeholder="Name"
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          Create an Account
+        </Typography>
+        <Box component="form" onSubmit={onSubmit} noValidate sx={{ mt: 1 }}>
+          {error && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="name"
+            label="Full Name"
             name="name"
+            autoComplete="name"
+            autoFocus
             value={name}
             onChange={onChange}
-            required
           />
-        </div>
-        <div>
-          <input
-            type="email"
-            placeholder="Email Address"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
             name="email"
+            autoComplete="email"
             value={email}
             onChange={onChange}
-            required
           />
-        </div>
-        <div>
-          <input
-            type="password"
-            placeholder="Password"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="new-password"
             value={password}
             onChange={onChange}
-            minLength="6"
-            required
           />
-        </div>
-        <input type="submit" value="Register" />
-      </form>
-    </div>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : "Sign Up"}
+          </Button>
+          <Typography variant="body2" align="center">
+            Already have an account?{" "}
+            <Link to="/login" style={{ color: "#1976d2" }}>
+              Sign In
+            </Link>
+          </Typography>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

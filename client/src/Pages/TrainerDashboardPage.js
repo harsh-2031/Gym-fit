@@ -1,6 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; // Make sure Link is imported
+import { Link as RouterLink } from "react-router-dom";
+
+// --- MUI Imports ---
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  CircularProgress,
+  Alert,
+} from "@mui/material";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import GroupIcon from "@mui/icons-material/Group";
 
 const TrainerDashboardPage = () => {
   const [clients, setClients] = useState([]);
@@ -8,14 +28,12 @@ const TrainerDashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const trainerInfo = JSON.parse(localStorage.getItem("trainer"));
 
-  // Function to fetch clients, reusable
   const fetchClients = async () => {
     try {
       const token = localStorage.getItem("trainerToken");
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       const { data } = await axios.get(
         "http://localhost:5000/api/trainers/clients",
         config
@@ -44,67 +62,117 @@ const TrainerDashboardPage = () => {
         { clientEmail },
         config
       );
-      setMessage(`Client with email ${clientEmail} added successfully!`);
-      setClientEmail(""); // Clear input
-      fetchClients(); // Refresh the client list
+      setMessage("Client added successfully!");
+      setClientEmail("");
+      fetchClients();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add client.");
+      console.error(err); // helpful for debugging
     }
   };
 
-  if (loading) return <p>Loading dashboard...</p>;
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
 
-  // --- EVERYTHING MUST BE INSIDE THIS ONE RETURN STATEMENT ---
   return (
-    <div>
-      <h1>Trainer Dashboard</h1>
-
-      {/* --- ADDED THE LINK HERE --- */}
-      <div style={{ margin: "20px 0" }}>
-        <Link to="/trainer/workouts">
-          <button>My Workout Templates</button>
-        </Link>
-      </div>
-
-      {/* Add New Client Form */}
-      <div
-        style={{ margin: "20px 0", padding: "15px", border: "1px solid #ddd" }}
+    <Box>
+      {/* --- HEADER SECTION --- */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
       >
-        <h3>Add New Client</h3>
-        <form onSubmit={handleAddClient}>
-          <input
-            type="email"
-            placeholder="Client's Email Address"
-            value={clientEmail}
-            onChange={(e) => setClientEmail(e.target.value)}
-            required
-          />
-          <button type="submit">Add Client</button>
-        </form>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {message && <p style={{ color: "green" }}>{message}</p>}
-      </div>
+        <Typography variant="h4" component="h1">
+          Welcome, {trainerInfo ? trainerInfo.name : "Trainer"}!
+        </Typography>
+        <Button
+          variant="contained"
+          component={RouterLink}
+          to="/trainer/workouts"
+        >
+          My Workout Templates
+        </Button>
+      </Box>
 
-      {/* Client List */}
-      <div>
-        <h2>My Clients</h2>
-        {clients.length > 0 ? (
-          <ul>
-            {clients.map((client) => (
-              <li key={client._id}>
-                {/* Make the client name a link */}
-                <Link to={`/trainer/client/${client._id}`}>
-                  {client.name}
-                </Link>{" "}
-                - {client.email}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>You don't have any clients yet.</p>
-        )}
-      </div>
-    </div>
+      <Grid container spacing={3} alignItems="stretch">
+        {/* --- ADD CLIENT CARD --- */}
+        <Grid item xs={12} md={5}>
+          <Card elevation={3} sx={{ height: "100%" }}>
+            <CardHeader avatar={<PersonAddIcon />} title="Add New Client" />
+            <CardContent>
+              <Box component="form" onSubmit={handleAddClient}>
+                <TextField
+                  fullWidth
+                  type="email"
+                  label="Client's Email Address"
+                  value={clientEmail}
+                  onChange={(e) => setClientEmail(e.target.value)}
+                  required
+                  sx={{ mb: 2 }}
+                />
+                <Button type="submit" variant="contained" fullWidth>
+                  Add Client
+                </Button>
+              </Box>
+              {error && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {error}
+                </Alert>
+              )}
+              {message && (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                  {message}
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* --- CLIENTS LIST CARD --- */}
+        <Grid item xs={12} md={7}>
+          <Card
+            elevation={3}
+            sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+          >
+            <CardHeader avatar={<GroupIcon />} title="My Clients" />
+            <CardContent sx={{ flexGrow: 1, overflow: "auto" }}>
+              {clients.length > 0 ? (
+                <List>
+                  {clients.map((client) => (
+                    <ListItem key={client._id} disablePadding>
+                      <ListItemButton
+                        component={RouterLink}
+                        to={`/trainer/client/${client._id}`}
+                        sx={{
+                          borderRadius: 1,
+                          "&:hover": { backgroundColor: "action.hover" },
+                        }}
+                      >
+                        <ListItemText
+                          primary={client.name}
+                          secondary={client.email}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography color="text.secondary">
+                  You don't have any clients yet.
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

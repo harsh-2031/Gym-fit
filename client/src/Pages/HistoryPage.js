@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+
+// --- MUI Imports ---
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import EventNoteIcon from "@mui/icons-material/EventNote";
 
 const HistoryPage = () => {
   const [sessions, setSessions] = useState([]);
@@ -10,11 +21,7 @@ const HistoryPage = () => {
     const fetchSessions = async () => {
       try {
         const token = localStorage.getItem("token");
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        };
+        const config = { headers: { Authorization: `Bearer ${token}` } };
         const { data } = await axios.get(
           "http://localhost:5000/api/sessions",
           config
@@ -26,61 +33,91 @@ const HistoryPage = () => {
         setLoading(false);
       }
     };
-
     fetchSessions();
   }, []);
 
   if (loading) {
-    return <p>Loading history...</p>;
-  }
-
-  if (sessions.length === 0) {
     return (
-      <div>
-        <h1>Workout History</h1>
-        <p>You haven't completed any workouts yet. Go start one!</p>
-        <Link to="/workouts">Go to my Workout Plans</Link>
-      </div>
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
   return (
-    <div>
-      <h1>Workout History</h1>
-      <div className="session-list">
-        {sessions.map((session) => (
-          <div
-            key={session._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "15px",
-              margin: "10px 0",
-              borderRadius: "5px",
-            }}
-          >
-            <h3>
-              {session.workoutPlan ? session.workoutPlan.name : "Workout Plan"}
-            </h3>
-            <p>
-              <strong>Date:</strong>{" "}
-              {new Date(session.date).toLocaleDateString()}
-            </p>
-            {session.duration && (
-              <p>
-                <strong>Duration:</strong> {session.duration} minutes
-              </p>
-            )}
-            {session.notes && (
-              <p>
-                <strong>Notes:</strong> {session.notes}
-              </p>
-            )}
-            {/* Optional: Add a link to a detailed view later */}
-            {/* <Link to={`/history/${session._id}`}>View Details</Link> */}
-          </div>
-        ))}
-      </div>
-    </div>
+    <Box>
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        sx={{ display: "flex", alignItems: "center" }}
+      >
+        <EventNoteIcon sx={{ mr: 1, fontSize: "2rem" }} /> Workout History
+      </Typography>
+
+      {sessions.length > 0 ? (
+        sessions.map((session) => (
+          <Accordion key={session._id} sx={{ my: 1 }}>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`panel-${session._id}-content`}
+              id={`panel-${session._id}-header`}
+            >
+              <Typography sx={{ width: "50%", flexShrink: 0 }}>
+                {session.workoutPlan
+                  ? session.workoutPlan.name
+                  : "Workout Plan"}
+              </Typography>
+              <Typography sx={{ color: "text.secondary" }}>
+                {new Date(session.date).toLocaleDateString()}
+              </Typography>
+            </AccordionSummary>
+
+            <AccordionDetails>
+              {session.duration && (
+                <Typography>
+                  <strong>Duration:</strong> {session.duration} minutes
+                </Typography>
+              )}
+
+              {session.notes && (
+                <Typography>
+                  <strong>Notes:</strong> {session.notes}
+                </Typography>
+              )}
+
+              {/* --- NEW: Workout Plan Overview --- */}
+              {session.workoutPlan && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Workout Overview
+                  </Typography>
+                  {session.workoutPlan.exercises &&
+                  session.workoutPlan.exercises.length > 0 ? (
+                    <ul style={{ marginLeft: "1rem" }}>
+                      {session.workoutPlan.exercises.map((exercise, idx) => (
+                        <li key={idx}>
+                          <Typography variant="body2">
+                            {exercise.name} – {exercise.sets} sets ×{" "}
+                            {exercise.reps} reps
+                          </Typography>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No exercises listed for this workout.
+                    </Typography>
+                  )}
+                </Box>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        ))
+      ) : (
+        <Typography>You haven't completed any workouts yet.</Typography>
+      )}
+    </Box>
   );
 };
 
