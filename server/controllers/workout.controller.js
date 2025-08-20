@@ -6,7 +6,7 @@ const Workout = require("../models/workout.model");
 const createWorkout = async (req, res) => {
   const { name, description, exercises } = req.body;
 
-  if (!name || exercises.length === 0) {
+  if (!name || !exercises || exercises.length === 0) {
     return res
       .status(400)
       .json({ message: "Please provide a name and at least one exercise" });
@@ -39,4 +39,28 @@ const getUserWorkouts = async (req, res) => {
   }
 };
 
-module.exports = { createWorkout, getUserWorkouts };
+// @desc    Get a single workout by ID
+// @route   GET /api/workouts/:id
+// @access  Private
+const getWorkoutById = async (req, res) => {
+  try {
+    const workout = await Workout.findById(req.params.id).populate(
+      "exercises.exercise"
+    );
+
+    if (workout && workout.user.toString() === req.user._id.toString()) {
+      res.json(workout);
+    } else {
+      res.status(404).json({ message: "Workout not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
+
+// Export ALL functions in a single object
+module.exports = {
+  createWorkout,
+  getUserWorkouts,
+  getWorkoutById,
+};

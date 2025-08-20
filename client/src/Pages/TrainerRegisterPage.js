@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-const LoginPage = () => {
+const TrainerRegisterPage = () => {
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
   });
   const navigate = useNavigate();
 
-  const { email, password } = formData;
+  const { name, email, password } = formData;
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,24 +19,35 @@ const LoginPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Note the new API endpoint for trainers
       const res = await axios.post(
-        "http://localhost:5000/api/users/login",
+        "http://localhost:5000/api/trainers/register",
         formData
       );
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data));
-
-      // --- CHANGE THIS LINE ---
-      navigate("/dashboard"); // Redirect to the new dashboard on successful login
+      console.log(res.data);
+      alert("Registration successful! Please log in.");
+      navigate("/trainer/login"); // Redirect to trainer login page
     } catch (err) {
       console.error(err.response.data);
+      alert("Registration failed. Email may already be in use.");
     }
   };
 
   return (
     <div>
-      <h1>Login</h1>
+      <h1>Trainer Registration</h1>
+      <p>Sign up to start managing your clients.</p>
       <form onSubmit={onSubmit}>
+        <div>
+          <input
+            type="text"
+            placeholder="Full Name"
+            name="name"
+            value={name}
+            onChange={onChange}
+            required
+          />
+        </div>
         <div>
           <input
             type="email"
@@ -57,10 +69,14 @@ const LoginPage = () => {
             required
           />
         </div>
-        <input type="submit" value="Login" />
+        <input type="submit" value="Register as Trainer" />
       </form>
+      <p>
+        Already have a trainer account?{" "}
+        <Link to="/trainer/login">Login Here</Link>
+      </p>
     </div>
   );
 };
 
-export default LoginPage;
+export default TrainerRegisterPage;

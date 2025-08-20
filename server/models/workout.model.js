@@ -14,9 +14,10 @@ const workoutExerciseSchema = new mongoose.Schema({
 const workoutSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    name: { type: String, required: true, trim: true }, // e.g., "Push Day A"
+    name: { type: String, required: true, trim: true },
     description: { type: String },
     exercises: [workoutExerciseSchema],
+    assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Trainer" }, // ADD THIS LINE
   },
   { timestamps: true }
 );

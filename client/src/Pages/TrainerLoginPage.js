@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
-const LoginPage = () => {
+const TrainerLoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -18,23 +18,26 @@ const LoginPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Note the new API endpoint for trainers
       const res = await axios.post(
-        "http://localhost:5000/api/users/login",
+        "http://localhost:5000/api/trainers/login",
         formData
       );
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data));
 
-      // --- CHANGE THIS LINE ---
-      navigate("/dashboard"); // Redirect to the new dashboard on successful login
+      // It's a good practice to store the trainer token with a different name
+      localStorage.setItem("trainerToken", res.data.token);
+      localStorage.setItem("trainer", JSON.stringify(res.data));
+
+      navigate("/trainer/dashboard"); // Redirect to the future trainer dashboard
     } catch (err) {
       console.error(err.response.data);
+      alert("Invalid credentials");
     }
   };
 
   return (
     <div>
-      <h1>Login</h1>
+      <h1>Trainer Login</h1>
       <form onSubmit={onSubmit}>
         <div>
           <input
@@ -57,10 +60,14 @@ const LoginPage = () => {
             required
           />
         </div>
-        <input type="submit" value="Login" />
+        <input type="submit" value="Login as Trainer" />
       </form>
+      <p>
+        Don't have a trainer account?{" "}
+        <Link to="/trainer/register">Register Here</Link>
+      </p>
     </div>
   );
 };
 
-export default LoginPage;
+export default TrainerLoginPage;

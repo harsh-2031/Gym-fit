@@ -2,27 +2,27 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const WorkoutsPage = () => {
+const TrainerWorkoutsPage = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
-        const token = localStorage.getItem("token");
+        // Use the trainerToken for authentication
+        const token = localStorage.getItem("trainerToken");
         const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         };
+        // Fetch from the new trainer-specific endpoint
         const { data } = await axios.get(
-          "http://localhost:5000/api/workouts",
+          "http://localhost:5000/api/trainers/workouts",
           config
         );
         setWorkouts(data);
-        setLoading(false);
       } catch (error) {
         console.error("Failed to fetch workouts", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -30,14 +30,12 @@ const WorkoutsPage = () => {
     fetchWorkouts();
   }, []);
 
-  if (loading) {
-    return <p>Loading workouts...</p>;
-  }
+  if (loading) return <p>Loading workout templates...</p>;
 
   return (
     <div>
-      <h1>My Workout Plans</h1>
-      <Link to="/create-workout">Create New Workout Plan</Link>
+      <h1>My Workout Templates</h1>
+      <Link to="/trainer/create-workout">Create New Template</Link>
       <div>
         {workouts.length > 0 ? (
           workouts.map((workout) => (
@@ -51,18 +49,15 @@ const WorkoutsPage = () => {
             >
               <h2>{workout.name}</h2>
               <p>{workout.description}</p>
-              {/* ADD THIS LINK/BUTTON */}
-              <Link to={`/workout/${workout._id}`}>
-                <button>Start Workout</button>
-              </Link>
+              {/* In the future, you could add Edit/Delete buttons here */}
             </div>
           ))
         ) : (
-          <p>You haven't created any workout plans yet.</p>
+          <p>You haven't created any workout templates yet.</p>
         )}
       </div>
     </div>
   );
 };
 
-export default WorkoutsPage;
+export default TrainerWorkoutsPage;
