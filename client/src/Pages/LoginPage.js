@@ -21,17 +21,15 @@ const LoginPage = () => {
         "http://localhost:5000/api/users/login",
         formData
       );
-      // Store all user data from the response
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
 
-      // --- REDIRECTION LOGIC ---
       if (res.data.hasCompletedOnboarding) {
         navigate("/dashboard");
       } else {
         navigate("/onboarding");
       }
-      window.location.reload(); // Refresh to update navbar
+      window.location.reload();
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");
       setLoading(false);
@@ -39,68 +37,65 @@ const LoginPage = () => {
   };
 
   const inputClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+    "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
   const buttonClasses =
-    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50";
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-secondary bg-primary hover:bg-primary/80 disabled:opacity-50";
 
   return (
     <div className="flex items-center justify-center">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+      <div className="max-w-md w-full space-y-8 p-8 bg-bg-paper shadow-lg rounded-lg">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-text-primary">
             Sign in to your account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={onSubmit}>
           {error && (
-            <div className="p-3 bg-red-100 text-red-700 rounded-md">
+            <div className="p-3 bg-red-500/20 text-red-400 rounded-md text-sm">
               {error}
             </div>
           )}
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                value={email}
-                onChange={onChange}
-                required
-                className={inputClasses}
-                placeholder="Email address"
-              />
-            </div>
-            <div className="pt-4">
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={password}
-                onChange={onChange}
-                required
-                className={inputClasses}
-                placeholder="Password"
-              />
-            </div>
+          <div>
+            <label htmlFor="email-address" className="sr-only">
+              Email address
+            </label>
+            <input
+              id="email-address"
+              name="email"
+              type="email"
+              value={email}
+              onChange={onChange}
+              required
+              className={inputClasses}
+              placeholder="Email address"
+            />
           </div>
-
+          <div className="pt-4">
+            <label htmlFor="password" className="sr-only">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={onChange}
+              required
+              className={inputClasses}
+              placeholder="Password"
+            />
+          </div>
           <div>
             <button type="submit" className={buttonClasses} disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </button>
           </div>
         </form>
-        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-center text-sm text-text-secondary">
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-medium text-primary hover:text-primary/80"
           >
             Sign Up
           </Link>

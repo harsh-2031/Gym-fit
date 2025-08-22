@@ -25,12 +25,11 @@ const OnboardingPage = () => {
         config
       );
 
-      // Update local storage to reflect completion
       const user = JSON.parse(localStorage.getItem("user"));
       user.hasCompletedOnboarding = true;
       localStorage.setItem("user", JSON.stringify(user));
 
-      navigate("/dashboard"); // Go to dashboard after completion
+      navigate("/dashboard");
     } catch (error) {
       console.error("Failed to submit details", error);
       alert("Could not save details. Please try again.");
@@ -38,21 +37,24 @@ const OnboardingPage = () => {
   };
 
   const inputClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+    "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
   const buttonClasses =
-    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700";
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-secondary bg-primary hover:bg-primary/80";
 
   return (
-    <div className="max-w-lg mx-auto p-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold text-center mb-2">
+    <div className="max-w-lg mx-auto p-8 bg-bg-paper shadow-lg rounded-lg">
+      <h1 className="text-3xl font-bold text-center mb-2 text-text-primary">
         Tell Us About Yourself
       </h1>
-      <p className="text-center text-gray-500 dark:text-gray-400 mb-6">
+      <p className="text-center text-text-secondary mb-6">
         This will help us tailor your experience.
       </p>
       <form onSubmit={onSubmit} className="space-y-6">
         <div>
-          <label htmlFor="age" className="block text-sm font-medium">
+          <label
+            htmlFor="age"
+            className="block text-sm font-medium text-text-secondary"
+          >
             Age
           </label>
           <input
@@ -65,7 +67,10 @@ const OnboardingPage = () => {
           />
         </div>
         <div>
-          <label htmlFor="weight" className="block text-sm font-medium">
+          <label
+            htmlFor="weight"
+            className="block text-sm font-medium text-text-secondary"
+          >
             Weight (kg)
           </label>
           <input
@@ -78,7 +83,10 @@ const OnboardingPage = () => {
           />
         </div>
         <div>
-          <label htmlFor="height" className="block text-sm font-medium">
+          <label
+            htmlFor="height"
+            className="block text-sm font-medium text-text-secondary"
+          >
             Height (cm)
           </label>
           <input
@@ -91,7 +99,10 @@ const OnboardingPage = () => {
           />
         </div>
         <div>
-          <label htmlFor="goal" className="block text-sm font-medium">
+          <label
+            htmlFor="goal"
+            className="block text-sm font-medium text-text-secondary"
+          >
             What is your primary goal?
           </label>
           <select

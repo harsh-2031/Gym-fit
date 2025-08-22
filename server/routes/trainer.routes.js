@@ -12,6 +12,7 @@ const {
   assignWorkout,
   updateWorkoutTemplate,
   getWorkoutTemplateById,
+  getTrainerStats,
 } = require("../controllers/trainer.controller");
 const { protectTrainer } = require("../middleware/trainerAuth.middleware");
 
@@ -41,5 +42,6 @@ router
   .get(protectTrainer, getWorkoutTemplateById)
   .put(protectTrainer, updateWorkoutTemplate)
   .delete(protectTrainer, deleteWorkoutTemplate);
+router.get("/profile/stats", protectTrainer, getTrainerStats);
 
 module.exports = router;

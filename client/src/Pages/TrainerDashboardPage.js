@@ -51,32 +51,38 @@ const TrainerDashboardPage = () => {
     }
   };
 
-  if (loading) return <p>Loading Dashboard...</p>;
+  if (loading) return <p className="text-center mt-8">Loading Dashboard...</p>;
 
-  const cardClasses = "bg-white dark:bg-gray-800 rounded-lg shadow-md p-6";
+  // --- UPDATED to use theme colors ---
+  const cardClasses = "bg-bg-paper rounded-lg shadow-lg p-6 flex flex-col";
   const inputClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+    "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
   const buttonClasses =
-    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500";
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-secondary bg-primary hover:bg-primary/80";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold text-text-primary">
           Welcome, {trainerInfo ? trainerInfo.name : "Trainer"}!
         </h1>
         <RouterLink
           to="/trainer/workouts"
-          className="px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700"
+          className="px-4 py-2 text-sm font-semibold text-secondary bg-primary rounded-md hover:bg-primary/80"
         >
           My Templates
         </RouterLink>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        style={{ alignItems: "start" }}
+      >
         {/* Add Client Card */}
         <div className={cardClasses}>
-          <h2 className="text-xl font-bold mb-4">Add New Client</h2>
+          <h2 className="text-xl font-bold mb-4 text-text-primary">
+            Add New Client
+          </h2>
           <form onSubmit={handleAddClient} className="space-y-4">
             <input
               type="email"
@@ -91,12 +97,12 @@ const TrainerDashboardPage = () => {
             </button>
           </form>
           {error && (
-            <div className="mt-3 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+            <div className="mt-3 p-3 bg-red-500/20 text-red-400 rounded-md text-sm">
               {error}
             </div>
           )}
           {message && (
-            <div className="mt-3 p-3 bg-green-100 text-green-700 rounded-md text-sm">
+            <div className="mt-3 p-3 bg-green-500/20 text-green-400 rounded-md text-sm">
               {message}
             </div>
           )}
@@ -104,17 +110,21 @@ const TrainerDashboardPage = () => {
 
         {/* Clients List Card */}
         <div className={cardClasses}>
-          <h2 className="text-xl font-bold mb-4">My Clients</h2>
+          <h2 className="text-xl font-bold mb-4 text-text-primary">
+            My Clients
+          </h2>
           {clients.length > 0 ? (
             <ul className="space-y-3">
               {clients.map((client) => (
                 <li key={client._id}>
                   <RouterLink
                     to={`/trainer/client/${client._id}`}
-                    className="block p-3 rounded-md bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    className="block p-3 rounded-md bg-bg-default hover:bg-secondary/20"
                   >
-                    <p className="font-semibold">{client.name}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="font-semibold text-text-primary">
+                      {client.name}
+                    </p>
+                    <p className="text-sm text-text-secondary">
                       {client.email}
                     </p>
                   </RouterLink>
@@ -122,7 +132,7 @@ const TrainerDashboardPage = () => {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-text-secondary">
               You don't have any clients yet.
             </p>
           )}

@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const contactRoutes = require("./routes/contact.routes");
 require("dotenv").config();
 
 // --- 1. REQUIRE all your routes ONCE at the top ---
@@ -29,6 +30,7 @@ app.use("/api/workouts", workoutRoutes);
 app.use("/api/exercises", exerciseRoutes);
 app.use("/api/sessions", workoutSessionRoutes);
 app.use("/api/trainers", trainerRoutes);
+app.use("/api/contact", contactRoutes);
 
 // --- 5. START THE SERVER ---
 app.listen(port, () => {

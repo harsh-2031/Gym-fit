@@ -60,37 +60,60 @@ const ClientDetailsPage = () => {
     }
   };
 
-  const cardClasses = "bg-white dark:bg-gray-800 rounded-lg shadow-md p-6";
-  const selectClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+  const cardClasses = "bg-bg-paper rounded-lg shadow-lg p-6 flex flex-col";
+  const inputClasses =
+    "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
   const buttonClasses =
-    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500";
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-secondary bg-primary hover:bg-primary/80";
 
-  if (loading) return <p>Loading client details...</p>;
+  if (loading)
+    return <p className="text-center mt-8">Loading client details...</p>;
   if (error && !client)
     return (
-      <div className="p-3 bg-red-100 text-red-700 rounded-md">{error}</div>
+      <div className="p-4 bg-red-500/20 text-red-400 rounded-md">{error}</div>
     );
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Client Management</h1>
+      <h1 className="text-3xl font-bold text-text-primary">
+        Client Management
+      </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Client Information Card */}
-        <div className={`${cardClasses} md:col-span-1 text-center`}>
-          <div className="text-6xl mb-4 text-indigo-500 dark:text-indigo-400">
-            👤
-          </div>
-          <h2 className="text-2xl font-bold">{client?.name}</h2>
-          <p className="text-gray-500 dark:text-gray-400">{client?.email}</p>
+        <div
+          className={`${cardClasses} md:col-span-1 text-center items-center`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-20 w-20 mb-4 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          <h2 className="text-2xl font-bold text-text-primary">
+            {client?.name}
+          </h2>
+          <p className="text-text-secondary">{client?.email}</p>
         </div>
 
         {/* Assign Workout Card */}
         <div className={`${cardClasses} md:col-span-2`}>
-          <h3 className="text-xl font-bold mb-4">Assign a New Workout</h3>
+          <h3 className="text-xl font-bold mb-4 text-text-primary">
+            Assign a New Workout
+          </h3>
           <form onSubmit={handleAssignWorkout} className="space-y-4">
             <div>
-              <label htmlFor="template-select" className="sr-only">
+              <label
+                htmlFor="template-select"
+                className="block text-sm font-medium text-text-secondary mb-1"
+              >
                 Select a Template
               </label>
               <select
@@ -98,7 +121,7 @@ const ClientDetailsPage = () => {
                 value={selectedTemplate}
                 onChange={(e) => setSelectedTemplate(e.target.value)}
                 required
-                className={selectClasses}
+                className={inputClasses}
               >
                 <option value="" disabled>
                   -- Select a Template --
@@ -110,7 +133,7 @@ const ClientDetailsPage = () => {
                     </option>
                   ))
                 ) : (
-                  <option disabled>No templates available</option>
+                  <option disabled>No templates available to assign</option>
                 )}
               </select>
             </div>
@@ -119,12 +142,12 @@ const ClientDetailsPage = () => {
             </button>
           </form>
           {message && (
-            <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">
+            <div className="mt-4 p-3 bg-green-500/20 text-green-400 rounded-md text-sm">
               {message}
             </div>
           )}
           {error && (
-            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+            <div className="mt-4 p-3 bg-red-500/20 text-red-400 rounded-md text-sm">
               {error}
             </div>
           )}

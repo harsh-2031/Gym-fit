@@ -236,6 +236,29 @@ const getWorkoutTemplateById = async (req, res) => {
     res.status(500).json({ message: `Server Error: ${error.message}` });
   }
 };
+const getTrainerStats = async (req, res) => {
+  try {
+    const trainer = await Trainer.findById(req.trainer._id);
+    if (!trainer) {
+      return res.status(404).json({ message: "Trainer not found" });
+    }
+
+    // Calculate total clients
+    const totalClients = trainer.clients.length;
+
+    // Calculate total templates created by the trainer
+    const totalTemplates = await Workout.countDocuments({
+      user: req.trainer._id,
+    });
+
+    res.json({
+      totalClients,
+      totalTemplates,
+    });
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
 module.exports = {
   registerTrainer,
   loginTrainer,
@@ -248,4 +271,5 @@ module.exports = {
   deleteWorkoutTemplate,
   updateWorkoutTemplate,
   getWorkoutTemplateById,
+  getTrainerStats,
 };

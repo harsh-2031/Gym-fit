@@ -6,13 +6,11 @@ const TrainerCreateWorkoutPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [exercises, setExercises] = useState([]);
-
   const [muscleGroupFilter, setMuscleGroupFilter] = useState("");
   const [allExercises, setAllExercises] = useState([]);
   const [selectedExercise, setSelectedExercise] = useState("");
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,21 +89,23 @@ const TrainerCreateWorkoutPage = () => {
     "Core",
   ];
   const inputClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+    "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
   const buttonClasses =
-    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500";
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-secondary bg-primary hover:bg-primary/80";
   const outlinedButtonClasses =
-    "w-full h-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700";
+    "w-full h-full flex justify-center py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-text-secondary bg-bg-paper hover:bg-secondary/20";
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Create New Workout Template</h1>
+    <div className="bg-bg-paper shadow-lg rounded-lg p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-text-primary">
+        Create New Workout Template
+      </h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-text-secondary"
             >
               Template Name
             </label>
@@ -121,7 +121,7 @@ const TrainerCreateWorkoutPage = () => {
           <div>
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-text-secondary"
             >
               Description (Optional)
             </label>
@@ -134,13 +134,15 @@ const TrainerCreateWorkoutPage = () => {
             />
           </div>
         </div>
-        <hr className="dark:border-gray-600" />
+        <hr className="border-gray-700" />
         <div>
-          <h2 className="text-xl font-semibold mb-4">Add Exercises</h2>
+          <h2 className="text-xl font-semibold mb-4 text-text-primary">
+            Add Exercises
+          </h2>
           <div className="mb-4">
             <label
               htmlFor="muscleGroup-filter"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-medium text-text-secondary mb-1"
             >
               Filter by Body Part
             </label>
@@ -209,16 +211,18 @@ const TrainerCreateWorkoutPage = () => {
         </div>
         {exercises.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold">Current Template:</h3>
+            <h3 className="text-lg font-semibold text-text-primary">
+              Current Template:
+            </h3>
             <ul className="mt-2 space-y-2">
               {exercises.map((ex, index) => (
                 <li
                   key={index}
-                  className="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-md"
+                  className="flex justify-between items-center bg-bg-default p-3 rounded-md"
                 >
                   <div>
-                    <p className="font-medium">{ex.name}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{`${ex.sets} sets of ${ex.reps} reps`}</p>
+                    <p className="font-medium text-text-primary">{ex.name}</p>
+                    <p className="text-sm text-text-secondary">{`${ex.sets} sets of ${ex.reps} reps`}</p>
                   </div>
                   <button
                     type="button"
