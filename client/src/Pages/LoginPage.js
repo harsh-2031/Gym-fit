@@ -21,9 +21,17 @@ const LoginPage = () => {
         "http://localhost:5000/api/users/login",
         formData
       );
+      // Store all user data from the response
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
-      navigate("/dashboard");
+
+      // --- REDIRECTION LOGIC ---
+      if (res.data.hasCompletedOnboarding) {
+        navigate("/dashboard");
+      } else {
+        navigate("/onboarding");
+      }
+      window.location.reload(); // Refresh to update navbar
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");
       setLoading(false);

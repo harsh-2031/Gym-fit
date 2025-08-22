@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// A simple SVG icon component for the collapsible section
 const ChevronIcon = () => (
   <svg
     className="w-5 h-5 transition-transform duration-200"
@@ -22,14 +21,13 @@ const ChevronIcon = () => (
 const LiveWorkoutPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [workoutPlan, setWorkoutPlan] = useState(null);
   const [performedExercises, setPerformedExercises] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [duration, setDuration] = useState(0); // Workout timer in seconds
+  const [duration, setDuration] = useState(0);
   const [timerActive, setTimerActive] = useState(true);
 
-  // Timer effect
+  // Timer and Data Fetching logic remains the same...
   useEffect(() => {
     let interval = null;
     if (timerActive) {
@@ -40,7 +38,6 @@ const LiveWorkoutPage = () => {
     return () => clearInterval(interval);
   }, [timerActive]);
 
-  // Data fetching effect
   useEffect(() => {
     const fetchWorkoutPlan = async () => {
       try {
@@ -51,7 +48,6 @@ const LiveWorkoutPage = () => {
           config
         );
         setWorkoutPlan(data);
-
         const initialPerformance = data.exercises.map((ex) => ({
           exercise: ex.exercise._id,
           sets: Array.from({ length: ex.sets }, () => ({
@@ -115,22 +111,24 @@ const LiveWorkoutPage = () => {
   };
 
   const inputClasses =
-    "w-full px-3 py-2 text-center border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+    "w-full px-3 py-2 text-center border border-gray-700 bg-bg-default rounded-md focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
   const buttonClasses =
-    "w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500";
+    "w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-secondary bg-primary hover:bg-primary/80";
 
   if (loading || !workoutPlan) {
     return <p>Loading workout...</p>;
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 sm:p-6 max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl sm:text-3xl font-bold">{workoutPlan.name}</h1>
-        <div className="flex items-center space-x-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-md">
+    <div className="bg-bg-paper shadow-lg rounded-lg p-4 sm:p-6 max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-4 pb-4 border-b border-gray-700">
+        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary">
+          {workoutPlan.name}
+        </h1>
+        <div className="flex items-center space-x-2 p-2 bg-bg-default rounded-md">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
+            className="h-6 w-6 text-text-secondary"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -142,32 +140,33 @@ const LiveWorkoutPage = () => {
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="text-xl font-semibold tabular-nums">
+          <span className="text-xl font-semibold tabular-nums text-text-primary">
             {formatTime(duration)}
           </span>
         </div>
       </div>
-
       <div className="space-y-3">
         {workoutPlan.exercises.map((exerciseDetail, exerciseIndex) => (
           <details
             key={exerciseDetail.exercise._id}
-            className="bg-gray-50 dark:bg-gray-900/50 rounded-lg group"
+            className="bg-bg-default/50 rounded-lg group"
             open={exerciseIndex === 0}
           >
             <summary className="flex justify-between items-center p-4 cursor-pointer list-none">
               <div className="flex-grow">
-                <p className="font-semibold">{exerciseDetail.exercise.name}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="font-semibold text-text-primary">
+                  {exerciseDetail.exercise.name}
+                </p>
+                <p className="text-sm text-text-secondary">
                   Target: {exerciseDetail.sets} sets of {exerciseDetail.reps}{" "}
                   reps
                 </p>
               </div>
-              <div className="group-open:rotate-180">
+              <div className="transform group-open:rotate-180 transition-transform duration-200">
                 <ChevronIcon />
               </div>
             </summary>
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="p-4 border-t border-gray-700">
               <div className="space-y-3">
                 {Array.from({ length: exerciseDetail.sets }).map(
                   (_, setIndex) => (
@@ -176,7 +175,7 @@ const LiveWorkoutPage = () => {
                       className="grid grid-cols-12 gap-2 items-center"
                     >
                       <div className="col-span-3 sm:col-span-2">
-                        <p className="font-medium text-sm text-gray-600 dark:text-gray-300">
+                        <p className="font-medium text-sm text-text-secondary">
                           Set {setIndex + 1}
                         </p>
                       </div>
@@ -226,7 +225,6 @@ const LiveWorkoutPage = () => {
           </details>
         ))}
       </div>
-
       <button onClick={handleFinishWorkout} className={`${buttonClasses} mt-6`}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -247,5 +245,4 @@ const LiveWorkoutPage = () => {
     </div>
   );
 };
-
 export default LiveWorkoutPage;

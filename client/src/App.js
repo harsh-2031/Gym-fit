@@ -17,16 +17,16 @@ import TrainerDashboardPage from "./Pages/TrainerDashboardPage";
 import TrainerWorkoutsPage from "./Pages/TrainerWorkoutsPage";
 import TrainerCreateWorkoutPage from "./Pages/TrainerCreateWorkoutPage";
 import ClientDetailsPage from "./Pages/ClientDetailsPage";
-
-// --- Import the new Edit pages ---
+import OnboardingPage from "./Pages/OnboardingPage";
+import ProfilePage from "./Pages/ProfilePage";
 import EditWorkoutPage from "./Pages/EditWorkoutPage";
-// Assuming you will create this next for the trainer, as per the pattern
 import TrainerEditWorkoutPage from "./Pages/TrainerEditWorkoutPage";
+import TrainerProfilePage from "./Pages/TrainerProfilePage";
 
 function App() {
   return (
     <Router>
-      <div className="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col">
+      <div className="bg-bg-default text-text-primary min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow container mx-auto px-4 py-8">
           <Routes>
@@ -44,7 +44,8 @@ function App() {
               <Route path="/create-workout" element={<CreateWorkoutPage />} />
               <Route path="/workout/:id" element={<LiveWorkoutPage />} />
               <Route path="/history" element={<HistoryPage />} />
-              {/* Add the new edit route */}
+              <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/edit-workout/:id" element={<EditWorkoutPage />} />
             </Route>
 
@@ -63,14 +64,14 @@ function App() {
                 element={<TrainerCreateWorkoutPage />}
               />
               <Route
-                path="/trainer/client/:clientId"
-                element={<ClientDetailsPage />}
-              />
-              {/* Add the new trainer edit route */}
-              <Route
                 path="/trainer/edit-workout/:id"
                 element={<TrainerEditWorkoutPage />}
               />
+              <Route
+                path="/trainer/client/:clientId"
+                element={<ClientDetailsPage />}
+              />
+              <Route path="/trainer/profile" element={<TrainerProfilePage />} />
             </Route>
           </Routes>
         </main>

@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import BodyPartChart from "../components/BodyPartChart";
+import WorkoutCalendar from "../components/WorkoutCalendar";
 
 const DashboardPage = () => {
   const [user, setUser] = useState(null);
   const [recentSession, setRecentSession] = useState(null);
   const [workoutPlans, setWorkoutPlans] = useState([]);
   const [streak, setStreak] = useState(0);
+  const [visualData, setVisualData] = useState({
+    muscleGroupData: {},
+    workoutDates: [],
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,44 +27,24 @@ const DashboardPage = () => {
         }
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // --- MODIFIED: Fetching data separately for resilience ---
+        const [sessionsRes, plansRes, statsRes, visualsRes] = await Promise.all(
+          [
+            axios.get("http://localhost:5000/api/sessions", config),
+            axios.get("http://localhost:5000/api/workouts", config),
+            axios.get("http://localhost:5000/api/users/stats", config),
+            axios.get(
+              "http://localhost:5000/api/users/dashboard/visuals",
+              config
+            ),
+          ]
+        );
 
-        // Fetch Sessions
-        try {
-          const sessionsRes = await axios.get(
-            "http://localhost:5000/api/sessions",
-            config
-          );
-          if (sessionsRes.data.length > 0) {
-            setRecentSession(sessionsRes.data[0]);
-          }
-        } catch (err) {
-          console.error("Could not fetch sessions", err);
-        }
-
-        // Fetch Workout Plans
-        try {
-          const plansRes = await axios.get(
-            "http://localhost:5000/api/workouts",
-            config
-          );
-          setWorkoutPlans(plansRes.data);
-        } catch (err) {
-          console.error("Could not fetch workout plans", err);
-        }
-
-        // Fetch Stats (Streak)
-        try {
-          const statsRes = await axios.get(
-            "http://localhost:5000/api/users/stats",
-            config
-          );
-          setStreak(statsRes.data.streak);
-        } catch (err) {
-          console.error("Could not fetch stats", err);
-        }
+        if (sessionsRes.data.length > 0) setRecentSession(sessionsRes.data[0]);
+        setWorkoutPlans(plansRes.data);
+        setStreak(statsRes.data.streak);
+        setVisualData(visualsRes.data);
       } catch (error) {
-        console.error("An error occurred in the dashboard", error);
+        console.error("Failed to fetch dashboard data", error);
       } finally {
         setLoading(false);
       }
@@ -66,28 +52,23 @@ const DashboardPage = () => {
     fetchDashboardData();
   }, []);
 
-  const cardClasses =
-    "bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 flex flex-col";
+  const cardClasses = "bg-bg-paper rounded-lg shadow-lg p-6 flex flex-col";
 
-  if (loading) {
-    return <p className="text-center mt-8">Loading Dashboard...</p>;
-  }
+  if (loading) return <p className="text-center mt-8">Loading Dashboard...</p>;
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold text-text-primary">
         Welcome back, {user ? user.name : "Athlete"}!
       </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Streak Card */}
-        <div
-          className={`${cardClasses} items-center justify-center text-center`}
-        >
-          <h2 className="text-xl font-bold mb-2 flex items-center text-gray-800 dark:text-gray-200">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className={`${cardClasses} items-center text-center`}>
+          {/* --- ICON IS NOW FIXED HERE --- */}
+          <h2 className="text-xl font-bold mb-2 text-text-primary flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 mr-2 text-orange-500"
+              className="h-6 w-6 mr-2 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -107,51 +88,69 @@ const DashboardPage = () => {
             </svg>
             Workout Streak
           </h2>
-          <p className="text-6xl font-bold my-2 text-gray-900 dark:text-white">
-            {streak}
-          </p>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-6xl font-bold my-2 text-primary">{streak}</p>
+          <p className="text-text-secondary">
             {streak === 1 ? "Day" : "Days"} in a row!
           </p>
         </div>
-
-        {/* Last Workout Card */}
-        <div className={`${cardClasses} lg:col-span-2`}>
-          <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">
+        <div className={`${cardClasses} md:col-span-2`}>
+          <h2 className="text-xl font-bold mb-4 text-text-primary">
             Last Workout
           </h2>
           {recentSession ? (
             <div className="flex-grow">
-              <p className="font-semibold text-gray-900 dark:text-white">
+              <p className="font-semibold text-text-primary">
                 {recentSession.workoutPlan?.name || "Workout"}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-text-secondary">
                 on {new Date(recentSession.date).toLocaleDateString()}
               </p>
             </div>
           ) : (
-            <p className="text-gray-500 dark:text-gray-400 flex-grow">
+            <p className="text-text-secondary flex-grow">
               You haven't logged any workouts yet.
             </p>
           )}
           <Link
             to="/history"
-            className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-semibold mt-4 self-start"
+            className="text-primary/90 hover:text-primary text-sm font-semibold mt-4 self-start"
           >
             View Full History →
           </Link>
         </div>
       </div>
 
-      {/* Workout Plans Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className={`${cardClasses} lg:col-span-2`}>
+          <h2 className="text-xl font-bold mb-4 text-text-primary">
+            Body Part Focus
+          </h2>
+          {Object.keys(visualData.muscleGroupData).length > 0 ? (
+            <div className="relative h-60">
+              <BodyPartChart data={visualData.muscleGroupData} />
+            </div>
+          ) : (
+            <p className="text-center text-text-secondary mt-8">
+              Log workouts to see your focus areas!
+            </p>
+          )}
+        </div>
+        <div className={`${cardClasses} lg:col-span-3`}>
+          <h2 className="text-xl font-bold mb-4 text-text-primary">
+            Session Calendar
+          </h2>
+          <WorkoutCalendar workoutDates={visualData.workoutDates} />
+        </div>
+      </div>
+
       <div className={cardClasses}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+          <h2 className="text-xl font-bold text-text-primary">
             My Workout Plans
           </h2>
           <Link
             to="/create-workout"
-            className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-semibold"
+            className="text-primary/90 hover:text-primary text-sm font-semibold"
           >
             Create New Plan
           </Link>
@@ -161,14 +160,14 @@ const DashboardPage = () => {
             {workoutPlans.map((plan) => (
               <li
                 key={plan._id}
-                className="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-md"
+                className="flex justify-between items-center bg-bg-default p-3 rounded-md"
               >
-                <span className="font-medium text-gray-900 dark:text-gray-100">
+                <span className="font-medium text-text-primary">
                   {plan.name}
                 </span>
                 <Link
                   to={`/workout/${plan._id}`}
-                  className="px-3 py-1 text-sm font-semibold text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                  className="px-3 py-1 text-sm font-semibold text-secondary bg-primary rounded-md hover:bg-primary/80"
                 >
                   Start
                 </Link>
@@ -176,9 +175,7 @@ const DashboardPage = () => {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 dark:text-gray-400">
-            You have no workout plans yet.
-          </p>
+          <p className="text-text-secondary">You have no workout plans yet.</p>
         )}
       </div>
     </div>
