@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-// --- MUI Imports ---
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import EventNoteIcon from "@mui/icons-material/EventNote";
-
 const HistoryPage = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,87 +25,100 @@ const HistoryPage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <p>Loading history...</p>;
   }
 
   return (
-    <Box>
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        sx={{ display: "flex", alignItems: "center" }}
-      >
-        <EventNoteIcon sx={{ mr: 1, fontSize: "2rem" }} /> Workout History
-      </Typography>
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center mb-6">
+        <h1 className="text-3xl font-bold">Workout History</h1>
+      </div>
 
-      {sessions.length > 0 ? (
-        sessions.map((session) => (
-          <Accordion key={session._id} sx={{ my: 1 }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls={`panel-${session._id}-content`}
-              id={`panel-${session._id}-header`}
+      <div className="space-y-4">
+        {sessions.length > 0 ? (
+          sessions.map((session) => (
+            <details
+              key={session._id}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden group"
             >
-              <Typography sx={{ width: "50%", flexShrink: 0 }}>
-                {session.workoutPlan
-                  ? session.workoutPlan.name
-                  : "Workout Plan"}
-              </Typography>
-              <Typography sx={{ color: "text.secondary" }}>
-                {new Date(session.date).toLocaleDateString()}
-              </Typography>
-            </AccordionSummary>
+              <summary className="flex justify-between items-center p-5 cursor-pointer list-none">
+                <div>
+                  <h2 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
+                    {/* --- FIX #1: Use optional chaining here --- */}
+                    {session.workoutPlan?.name || "Deleted Workout Plan"}
+                  </h2>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(session.date).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="transform group-open:rotate-180 transition-transform duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </summary>
 
-            <AccordionDetails>
-              {session.duration && (
-                <Typography>
-                  <strong>Duration:</strong> {session.duration} minutes
-                </Typography>
-              )}
-
-              {session.notes && (
-                <Typography>
-                  <strong>Notes:</strong> {session.notes}
-                </Typography>
-              )}
-
-              {/* --- NEW: Workout Plan Overview --- */}
-              {session.workoutPlan && (
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Workout Overview
-                  </Typography>
-                  {session.workoutPlan.exercises &&
-                  session.workoutPlan.exercises.length > 0 ? (
-                    <ul style={{ marginLeft: "1rem" }}>
-                      {session.workoutPlan.exercises.map((exercise, idx) => (
-                        <li key={idx}>
-                          <Typography variant="body2">
-                            {exercise.name} – {exercise.sets} sets ×{" "}
-                            {exercise.reps} reps
-                          </Typography>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      No exercises listed for this workout.
-                    </Typography>
+              <div className="px-5 pb-5 border-t border-gray-200 dark:border-gray-700">
+                <div className="mt-4 text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  {session.duration && (
+                    <p>
+                      <strong>Duration:</strong> {session.duration} minutes
+                    </p>
                   )}
-                </Box>
-              )}
-            </AccordionDetails>
-          </Accordion>
-        ))
-      ) : (
-        <Typography>You haven't completed any workouts yet.</Typography>
-      )}
-    </Box>
+                  {session.notes && (
+                    <p>
+                      <strong>Notes:</strong> {session.notes}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-4">
+                  <h3 className="font-semibold mb-2">Performed Exercises:</h3>
+                  <ul className="space-y-3">
+                    {session.performedExercises.map((pe) => (
+                      <li
+                        key={pe._id}
+                        className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md"
+                      >
+                        {/* --- FIX #2: Use optional chaining here --- */}
+                        <p className="font-bold">
+                          {pe.exercise?.name || "Deleted Exercise"}
+                        </p>
+                        <ul className="list-disc list-inside mt-1 ml-2 text-sm text-gray-600 dark:text-gray-400">
+                          {pe.sets.map((set, setIndex) => (
+                            <li key={setIndex}>
+                              Set {setIndex + 1}: {set.reps} reps at{" "}
+                              {set.weight} kg
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </details>
+          ))
+        ) : (
+          <div className="text-center py-10 px-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <p className="text-gray-500 dark:text-gray-400">
+              You haven't completed any workouts yet.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

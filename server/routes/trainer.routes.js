@@ -5,33 +5,41 @@ const {
   loginTrainer,
   addClient,
   getMyClients,
+  getClientById,
   createWorkoutTemplate,
   getWorkoutTemplates,
+  deleteWorkoutTemplate,
   assignWorkout,
-  getClientById,
+  updateWorkoutTemplate,
+  getWorkoutTemplateById,
 } = require("../controllers/trainer.controller");
 const { protectTrainer } = require("../middleware/trainerAuth.middleware");
 
-// Public routes
+// --- Public Auth Routes ---
 router.post("/register", registerTrainer);
 router.post("/login", loginTrainer);
 
-// Protected client management routes
+// --- Protected Client Management Routes ---
 router
   .route("/clients")
   .post(protectTrainer, addClient)
   .get(protectTrainer, getMyClients);
 
-// Protected route for a single client
 router.get("/clients/:clientId", protectTrainer, getClientById);
-
-// Protected route for assigning workouts
 router.post("/clients/:clientId/assign-workout", protectTrainer, assignWorkout);
 
-// Protected routes for workout templates
+// --- Protected Workout Template Routes ---
 router
   .route("/workouts")
   .post(protectTrainer, createWorkoutTemplate)
   .get(protectTrainer, getWorkoutTemplates);
+
+// --- CORRECTED: Routes for a specific workout template by ID ---
+// All methods (GET, PUT, DELETE) for the same path are chained together here.
+router
+  .route("/workouts/:id")
+  .get(protectTrainer, getWorkoutTemplateById)
+  .put(protectTrainer, updateWorkoutTemplate)
+  .delete(protectTrainer, deleteWorkoutTemplate);
 
 module.exports = router;

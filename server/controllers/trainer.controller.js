@@ -154,12 +154,10 @@ const assignWorkout = async (req, res) => {
       assignedBy: req.trainer._id,
     });
     await newWorkoutForClient.save();
-    res
-      .status(201)
-      .json({
-        message: "Workout assigned successfully.",
-        workout: newWorkoutForClient,
-      });
+    res.status(201).json({
+      message: "Workout assigned successfully.",
+      workout: newWorkoutForClient,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -183,7 +181,61 @@ const getClientById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const deleteWorkoutTemplate = async (req, res) => {
+  try {
+    const workout = await Workout.findById(req.params.id);
 
+    if (!workout) {
+      return res.status(404).json({ message: "Workout template not found" });
+    }
+
+    // Verify this template was created by the logged-in trainer
+    if (workout.user.toString() !== req.trainer._id.toString()) {
+      return res
+        .status(401)
+        .json({ message: "Not authorized to delete this template" });
+    }
+
+    await Workout.deleteOne({ _id: req.params.id });
+
+    res.json({ message: "Workout template removed" });
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
+const updateWorkoutTemplate = async (req, res) => {
+  try {
+    const workout = await Workout.findById(req.params.id);
+    if (!workout) {
+      return res.status(404).json({ message: "Workout template not found" });
+    }
+    if (workout.user.toString() !== req.trainer._id.toString()) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+    const { name, description, exercises } = req.body;
+    workout.name = name || workout.name;
+    workout.description = description || workout.description;
+    workout.exercises = exercises || workout.exercises;
+    const updatedWorkout = await workout.save();
+    res.json(updatedWorkout);
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
+const getWorkoutTemplateById = async (req, res) => {
+  try {
+    const workout = await Workout.findById(req.params.id).populate(
+      "exercises.exercise"
+    );
+    if (workout && workout.user.toString() === req.trainer._id.toString()) {
+      res.json(workout);
+    } else {
+      res.status(404).json({ message: "Template not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
 module.exports = {
   registerTrainer,
   loginTrainer,
@@ -193,4 +245,7 @@ module.exports = {
   getWorkoutTemplates,
   assignWorkout,
   getClientById,
+  deleteWorkoutTemplate,
+  updateWorkoutTemplate,
+  getWorkoutTemplateById,
 };

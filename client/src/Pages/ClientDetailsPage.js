@@ -2,23 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
-// --- MUI Imports ---
-import {
-  Box,
-  Typography,
-  Grid,
-  Paper,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-
 const ClientDetailsPage = () => {
   const { clientId } = useParams();
   const [client, setClient] = useState(null);
@@ -77,93 +60,77 @@ const ClientDetailsPage = () => {
     }
   };
 
-  if (loading)
+  const cardClasses = "bg-white dark:bg-gray-800 rounded-lg shadow-md p-6";
+  const selectClasses =
+    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+  const buttonClasses =
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500";
+
+  if (loading) return <p>Loading client details...</p>;
+  if (error && !client)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <CircularProgress />
-      </Box>
+      <div className="p-3 bg-red-100 text-red-700 rounded-md">{error}</div>
     );
-  if (error && !client) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Client Management
-      </Typography>
-      <Grid container spacing={3}>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">Client Management</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Client Information Card */}
-        <Grid item xs={12} md={5}>
-          <Paper
-            elevation={3}
-            sx={{
-              p: 3,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <AccountCircleIcon
-              sx={{ fontSize: 80, mb: 2, color: "primary.main" }}
-            />
-            <Typography variant="h5" component="h2">
-              {client?.name}
-            </Typography>
-            <Typography color="text.secondary">{client?.email}</Typography>
-          </Paper>
-        </Grid>
+        <div className={`${cardClasses} md:col-span-1 text-center`}>
+          <div className="text-6xl mb-4 text-indigo-500 dark:text-indigo-400">
+            👤
+          </div>
+          <h2 className="text-2xl font-bold">{client?.name}</h2>
+          <p className="text-gray-500 dark:text-gray-400">{client?.email}</p>
+        </div>
 
         {/* Assign Workout Card */}
-        <Grid item xs={12} md={7}>
-          <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography
-              variant="h6"
-              component="h3"
-              gutterBottom
-              sx={{ display: "flex", alignItems: "center" }}
-            >
-              <AssignmentIcon sx={{ mr: 1 }} /> Assign a New Workout
-            </Typography>
-            <Box component="form" onSubmit={handleAssignWorkout}>
-              <FormControl fullWidth sx={{ my: 2 }}>
-                <InputLabel id="template-select-label">
-                  Select a Template
-                </InputLabel>
-                <Select
-                  labelId="template-select-label"
-                  value={selectedTemplate}
-                  label="Select a Template"
-                  onChange={(e) => setSelectedTemplate(e.target.value)}
-                  required
-                >
-                  {templates.length > 0 ? (
-                    templates.map((template) => (
-                      <MenuItem key={template._id} value={template._id}>
-                        {template.name}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled>No templates available</MenuItem>
-                  )}
-                </Select>
-              </FormControl>
-              <Button type="submit" variant="contained" fullWidth>
-                Assign Workout
-              </Button>
-            </Box>
-            {message && (
-              <Alert severity="success" sx={{ mt: 2 }}>
-                {message}
-              </Alert>
-            )}
-            {error && (
-              <Alert severity="error" sx={{ mt: 2 }}>
-                {error}
-              </Alert>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
-    </Box>
+        <div className={`${cardClasses} md:col-span-2`}>
+          <h3 className="text-xl font-bold mb-4">Assign a New Workout</h3>
+          <form onSubmit={handleAssignWorkout} className="space-y-4">
+            <div>
+              <label htmlFor="template-select" className="sr-only">
+                Select a Template
+              </label>
+              <select
+                id="template-select"
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
+                required
+                className={selectClasses}
+              >
+                <option value="" disabled>
+                  -- Select a Template --
+                </option>
+                {templates.length > 0 ? (
+                  templates.map((template) => (
+                    <option key={template._id} value={template._id}>
+                      {template.name}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No templates available</option>
+                )}
+              </select>
+            </div>
+            <button type="submit" className={buttonClasses}>
+              Assign Workout
+            </button>
+          </form>
+          {message && (
+            <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">
+              {message}
+            </div>
+          )}
+          {error && (
+            <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

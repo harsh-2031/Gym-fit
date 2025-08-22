@@ -32,8 +32,15 @@ const saveWorkoutSession = async (req, res) => {
 const getUserSessions = async (req, res) => {
   try {
     const sessions = await WorkoutSession.find({ user: req.user._id })
-      .populate("workoutPlan", "name") // Optionally get the name of the workout plan
+      .populate("workoutPlan", "name") // Populates the plan name
+      // --- THIS IS THE UPDATED PART ---
+      .populate({
+        path: "performedExercises.exercise", // The path inside the document
+        model: "Exercise", // The model to use for populating
+        select: "name", // We only need the name of the exercise
+      })
       .sort({ date: -1 }); // Sort by most recent
+
     res.json(sessions);
   } catch (error) {
     res.status(500).json({ message: `Server Error: ${error.message}` });

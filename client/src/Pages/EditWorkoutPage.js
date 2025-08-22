@@ -1,41 +1,65 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const TrainerCreateWorkoutPage = () => {
+const EditWorkoutPage = () => {
+  const { id } = useParams();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [exercises, setExercises] = useState([]);
-
   const [muscleGroupFilter, setMuscleGroupFilter] = useState("");
   const [allExercises, setAllExercises] = useState([]);
   const [selectedExercise, setSelectedExercise] = useState("");
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
-
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Effect to fetch the specific workout to edit
+  useEffect(() => {
+    const fetchWorkoutData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+        const { data } = await axios.get(
+          `http://localhost:5000/api/workouts/${id}`,
+          config
+        );
+
+        setName(data.name);
+        setDescription(data.description || "");
+        setExercises(
+          data.exercises.map((ex) => ({
+            exercise: ex.exercise._id,
+            name: ex.exercise.name,
+            sets: ex.sets,
+            reps: ex.reps,
+          }))
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch workout data", error);
+        setLoading(false);
+      }
+    };
+    fetchWorkoutData();
+  }, [id]);
+
+  // Effect to fetch the list of available exercises based on filter
   useEffect(() => {
     const fetchAllExercises = async () => {
-      try {
-        let url = "http://localhost:5000/api/exercises";
-        if (muscleGroupFilter) {
-          url += `?muscleGroup=${muscleGroupFilter}`;
-        }
-        const { data } = await axios.get(url);
-        setAllExercises(data);
-      } catch (error) {
-        console.error("Failed to fetch exercises", error);
+      let url = "http://localhost:5000/api/exercises";
+      if (muscleGroupFilter) {
+        url += `?muscleGroup=${muscleGroupFilter}`;
       }
+      const { data } = await axios.get(url);
+      setAllExercises(data);
     };
     fetchAllExercises();
   }, [muscleGroupFilter]);
 
   const handleAddExercise = () => {
-    if (!selectedExercise || !sets || !reps) {
-      alert("Please select an exercise and fill in sets and reps.");
-      return;
-    }
+    if (!selectedExercise || !sets || !reps) return;
     const exerciseToAdd = allExercises.find(
       (ex) => ex._id === selectedExercise
     );
@@ -58,7 +82,7 @@ const TrainerCreateWorkoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("trainerToken");
+      const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const workoutData = {
         name,
@@ -69,45 +93,44 @@ const TrainerCreateWorkoutPage = () => {
           reps,
         })),
       };
-      await axios.post(
-        "http://localhost:5000/api/trainers/workouts",
+      await axios.put(
+        `http://localhost:5000/api/workouts/${id}`,
         workoutData,
         config
       );
-      navigate("/trainer/workouts");
+      navigate("/workouts");
     } catch (error) {
-      console.error("Failed to create workout template", error);
+      console.error("Failed to update workout", error);
     }
   };
 
   const bodyParts = [
+    "Chest",
+    "Back",
+    "Legs",
+    "Shoulders",
     "Biceps",
     "Triceps",
-    "Back",
-    "Chest",
-    "Shoulders",
-    "Forearms",
-    "Legs",
     "Core",
+    "Forearms",
   ];
   const inputClasses =
     "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
   const buttonClasses =
-    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500";
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700";
   const outlinedButtonClasses =
     "w-full h-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700";
 
+  if (loading) return <p>Loading for edit...</p>;
+
   return (
     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Create New Workout Template</h1>
+      <h1 className="text-3xl font-bold mb-6">Edit Workout Plan</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
           <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              Template Name
+            <label htmlFor="name" className="block text-sm font-medium">
+              Workout Name
             </label>
             <input
               type="text"
@@ -119,10 +142,7 @@ const TrainerCreateWorkoutPage = () => {
             />
           </div>
           <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
+            <label htmlFor="description" className="block text-sm font-medium">
               Description (Optional)
             </label>
             <textarea
@@ -136,7 +156,7 @@ const TrainerCreateWorkoutPage = () => {
         </div>
         <hr className="dark:border-gray-600" />
         <div>
-          <h2 className="text-xl font-semibold mb-4">Add Exercises</h2>
+          <h2 className="text-xl font-semibold mb-4">Edit Exercises</h2>
           <div className="mb-4">
             <label
               htmlFor="muscleGroup-filter"
@@ -179,7 +199,6 @@ const TrainerCreateWorkoutPage = () => {
             <div className="sm:col-span-2">
               <input
                 type="number"
-                id="sets"
                 placeholder="Sets"
                 value={sets}
                 onChange={(e) => setSets(e.target.value)}
@@ -189,7 +208,6 @@ const TrainerCreateWorkoutPage = () => {
             <div className="sm:col-span-3">
               <input
                 type="text"
-                id="reps"
                 placeholder="Reps"
                 value={reps}
                 onChange={(e) => setReps(e.target.value)}
@@ -209,7 +227,7 @@ const TrainerCreateWorkoutPage = () => {
         </div>
         {exercises.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold">Current Template:</h3>
+            <h3 className="text-lg font-semibold">Current Plan:</h3>
             <ul className="mt-2 space-y-2">
               {exercises.map((ex, index) => (
                 <li
@@ -245,7 +263,7 @@ const TrainerCreateWorkoutPage = () => {
         )}
         <div>
           <button type="submit" className={buttonClasses}>
-            Save Template
+            Update Workout Plan
           </button>
         </div>
       </form>
@@ -253,4 +271,4 @@ const TrainerCreateWorkoutPage = () => {
   );
 };
 
-export default TrainerCreateWorkoutPage;
+export default EditWorkoutPage;

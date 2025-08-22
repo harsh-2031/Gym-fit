@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 
 const exerciseSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
-  description: { type: String, required: true },
+  // Add unique: true to the name property
+  name: { type: String, required: true, trim: true, unique: true },
+  description: { type: String }, // Description is optional
   muscleGroup: { type: String, required: true },
-  equipment: { type: String },
-  videoUrl: { type: String }, // Optional link to a demonstration video
 });
 
 const Exercise = mongoose.model("Exercise", exerciseSchema);

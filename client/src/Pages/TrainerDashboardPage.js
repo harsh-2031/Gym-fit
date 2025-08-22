@@ -2,26 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link as RouterLink } from "react-router-dom";
 
-// --- MUI Imports ---
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  CardHeader,
-  TextField,
-  Button,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import GroupIcon from "@mui/icons-material/Group";
-
 const TrainerDashboardPage = () => {
   const [clients, setClients] = useState([]);
   const [clientEmail, setClientEmail] = useState("");
@@ -67,113 +47,88 @@ const TrainerDashboardPage = () => {
       fetchClients();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add client.");
-      console.error(err); // helpful for debugging
+      console.error(err);
     }
   };
 
-  if (loading)
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
+  if (loading) return <p>Loading Dashboard...</p>;
+
+  const cardClasses = "bg-white dark:bg-gray-800 rounded-lg shadow-md p-6";
+  const inputClasses =
+    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+  const buttonClasses =
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500";
 
   return (
-    <Box>
-      {/* --- HEADER SECTION --- */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
-        }}
-      >
-        <Typography variant="h4" component="h1">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">
           Welcome, {trainerInfo ? trainerInfo.name : "Trainer"}!
-        </Typography>
-        <Button
-          variant="contained"
-          component={RouterLink}
+        </h1>
+        <RouterLink
           to="/trainer/workouts"
+          className="px-4 py-2 text-sm font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700"
         >
-          My Workout Templates
-        </Button>
-      </Box>
+          My Templates
+        </RouterLink>
+      </div>
 
-      <Grid container spacing={3} alignItems="stretch">
-        {/* --- ADD CLIENT CARD --- */}
-        <Grid item xs={12} md={5}>
-          <Card elevation={3} sx={{ height: "100%" }}>
-            <CardHeader avatar={<PersonAddIcon />} title="Add New Client" />
-            <CardContent>
-              <Box component="form" onSubmit={handleAddClient}>
-                <TextField
-                  fullWidth
-                  type="email"
-                  label="Client's Email Address"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  required
-                  sx={{ mb: 2 }}
-                />
-                <Button type="submit" variant="contained" fullWidth>
-                  Add Client
-                </Button>
-              </Box>
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
-              {message && (
-                <Alert severity="success" sx={{ mt: 2 }}>
-                  {message}
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Add Client Card */}
+        <div className={cardClasses}>
+          <h2 className="text-xl font-bold mb-4">Add New Client</h2>
+          <form onSubmit={handleAddClient} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Client's Email Address"
+              value={clientEmail}
+              onChange={(e) => setClientEmail(e.target.value)}
+              required
+              className={inputClasses}
+            />
+            <button type="submit" className={buttonClasses}>
+              Add Client
+            </button>
+          </form>
+          {error && (
+            <div className="mt-3 p-3 bg-red-100 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          {message && (
+            <div className="mt-3 p-3 bg-green-100 text-green-700 rounded-md text-sm">
+              {message}
+            </div>
+          )}
+        </div>
 
-        {/* --- CLIENTS LIST CARD --- */}
-        <Grid item xs={12} md={7}>
-          <Card
-            elevation={3}
-            sx={{ height: "100%", display: "flex", flexDirection: "column" }}
-          >
-            <CardHeader avatar={<GroupIcon />} title="My Clients" />
-            <CardContent sx={{ flexGrow: 1, overflow: "auto" }}>
-              {clients.length > 0 ? (
-                <List>
-                  {clients.map((client) => (
-                    <ListItem key={client._id} disablePadding>
-                      <ListItemButton
-                        component={RouterLink}
-                        to={`/trainer/client/${client._id}`}
-                        sx={{
-                          borderRadius: 1,
-                          "&:hover": { backgroundColor: "action.hover" },
-                        }}
-                      >
-                        <ListItemText
-                          primary={client.name}
-                          secondary={client.email}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-              ) : (
-                <Typography color="text.secondary">
-                  You don't have any clients yet.
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+        {/* Clients List Card */}
+        <div className={cardClasses}>
+          <h2 className="text-xl font-bold mb-4">My Clients</h2>
+          {clients.length > 0 ? (
+            <ul className="space-y-3">
+              {clients.map((client) => (
+                <li key={client._id}>
+                  <RouterLink
+                    to={`/trainer/client/${client._id}`}
+                    className="block p-3 rounded-md bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    <p className="font-semibold">{client.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {client.email}
+                    </p>
+                  </RouterLink>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400">
+              You don't have any clients yet.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
-
 export default TrainerDashboardPage;

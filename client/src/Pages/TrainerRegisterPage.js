@@ -2,17 +2,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
-// --- MUI Imports ---
-import {
-  Button,
-  TextField,
-  Container,
-  Typography,
-  Box,
-  CircularProgress,
-  Alert,
-} from "@mui/material";
-
 const TrainerRegisterPage = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -43,78 +32,89 @@ const TrainerRegisterPage = () => {
     }
   };
 
+  // Reusable Tailwind classes
+  const inputClasses =
+    "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white";
+  const buttonClasses =
+    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50";
+
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography component="h1" variant="h5">
-          Create a Trainer Account
-        </Typography>
-        <Box component="form" onSubmit={onSubmit} noValidate sx={{ mt: 1 }}>
+    <div className="flex items-center justify-center">
+      <div className="max-w-md w-full space-y-8 p-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+            Create a Trainer Account
+          </h2>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={onSubmit}>
           {error && (
-            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+            <div className="p-3 bg-red-100 text-red-700 rounded-md">
               {error}
-            </Alert>
+            </div>
           )}
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="name"
-            label="Full Name"
-            name="name"
-            autoComplete="name"
-            autoFocus
-            value={name}
-            onChange={onChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            value={email}
-            onChange={onChange}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={onChange}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            disabled={loading}
+          <div>
+            <label htmlFor="name" className="sr-only">
+              Full Name
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={name}
+              onChange={onChange}
+              required
+              className={inputClasses}
+              placeholder="Full Name"
+            />
+          </div>
+          <div className="pt-4">
+            <label htmlFor="email-address" className="sr-only">
+              Email address
+            </label>
+            <input
+              id="email-address"
+              name="email"
+              type="email"
+              value={email}
+              onChange={onChange}
+              required
+              className={inputClasses}
+              placeholder="Email address"
+            />
+          </div>
+          <div className="pt-4">
+            <label htmlFor="password" className="sr-only">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={onChange}
+              required
+              className={inputClasses}
+              placeholder="Password"
+            />
+          </div>
+
+          <div>
+            <button type="submit" className={buttonClasses} disabled={loading}>
+              {loading ? "Creating Account..." : "Sign Up as Trainer"}
+            </button>
+          </div>
+        </form>
+        <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          Already have a trainer account?{" "}
+          <Link
+            to="/trainer/login"
+            className="font-medium text-purple-600 hover:text-purple-500"
           >
-            {loading ? <CircularProgress size={24} /> : "Sign Up as Trainer"}
-          </Button>
-          <Typography variant="body2" align="center">
-            Already have a trainer account?{" "}
-            <Link to="/trainer/login" style={{ color: "#1976d2" }}>
-              Sign In
-            </Link>
-          </Typography>
-        </Box>
-      </Box>
-    </Container>
+            Sign In
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 };
 

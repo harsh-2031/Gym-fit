@@ -57,10 +57,55 @@ const getWorkoutById = async (req, res) => {
     res.status(500).json({ message: `Server Error: ${error.message}` });
   }
 };
+const deleteWorkout = async (req, res) => {
+  try {
+    const workout = await Workout.findById(req.params.id);
 
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" });
+    }
+
+    // Check if the workout belongs to the logged-in user
+    if (workout.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    await Workout.deleteOne({ _id: req.params.id });
+
+    res.json({ message: "Workout plan removed" });
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
+const updateWorkout = async (req, res) => {
+  try {
+    const workout = await Workout.findById(req.params.id);
+
+    if (!workout) {
+      return res.status(404).json({ message: "Workout not found" });
+    }
+
+    // Check if the workout belongs to the logged-in user
+    if (workout.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    const { name, description, exercises } = req.body;
+    workout.name = name || workout.name;
+    workout.description = description || workout.description;
+    workout.exercises = exercises || workout.exercises;
+
+    const updatedWorkout = await workout.save();
+    res.json(updatedWorkout);
+  } catch (error) {
+    res.status(500).json({ message: `Server Error: ${error.message}` });
+  }
+};
 // Export ALL functions in a single object
 module.exports = {
   createWorkout,
   getUserWorkouts,
   getWorkoutById,
+  deleteWorkout,
+  updateWorkout, // Add this
 };
