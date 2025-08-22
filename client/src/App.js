@@ -4,7 +4,7 @@ import {
   Route,
   Routes,
   useLocation,
-} from "react-router-dom"; // Import useLocation
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -28,17 +28,14 @@ import ProfilePage from "./Pages/ProfilePage";
 import EditWorkoutPage from "./Pages/EditWorkoutPage";
 import TrainerEditWorkoutPage from "./Pages/TrainerEditWorkoutPage";
 import TrainerProfilePage from "./Pages/TrainerProfilePage";
-
-// --- IMPORT THE NEW PAGES ---
 import AboutPage from "./Pages/AboutPage";
 import ContactPage from "./Pages/ContactPage";
 import PrivacyPolicyPage from "./Pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./Pages/TermsOfServicePage";
 
-// A new component to handle the main layout
+// This is the MainLayout component that contains your app's structure
 const MainLayout = () => {
   const location = useLocation();
-  // Paths where the footer should be hidden
   const footerHiddenPaths = [
     "/login",
     "/register",
@@ -58,7 +55,6 @@ const MainLayout = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/trainer/register" element={<TrainerRegisterPage />} />
           <Route path="/trainer/login" element={<TrainerLoginPage />} />
-          {/* --- ADD NEW STATIC ROUTES --- */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
