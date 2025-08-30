@@ -17,7 +17,7 @@ const port = process.env.PORT || 5000;
 const corsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? "YOUR_FRONTEND_URL_GOES_HERE" // We will get this from Vercel later
+      ? "https://gym-fit-pi.vercel.app/" // We will get this from Vercel later
       : "http://localhost:3000",
 };
 // --- 2. MIDDLEWARE ---
