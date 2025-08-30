@@ -9,6 +9,8 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { email, password } = formData;
 
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -17,18 +19,14 @@ const LoginPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/users/login",
-        formData
-      );
+      const res = await axios.post(`${API_URL}/api/users/login`, formData);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
 
-      if (res.data.hasCompletedOnboarding) {
-        navigate("/dashboard");
-      } else {
-        navigate("/onboarding");
-      }
+      // --- THIS IS THE MODIFIED REDIRECTION LOGIC ---
+      // This will now always navigate to the homepage after login.
+      navigate("/");
+
       window.location.reload();
     } catch (err) {
       setError(err.response?.data?.message || "Login failed.");

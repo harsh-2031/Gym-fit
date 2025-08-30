@@ -9,6 +9,9 @@ const TrainerLoginPage = () => {
   const navigate = useNavigate();
   const { email, password } = formData;
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -18,15 +21,16 @@ const TrainerLoginPage = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/trainers/login",
-        formData
-      );
+      // --- UPDATED URL ---
+      const res = await axios.post(`${API_URL}/api/trainers/login`, formData);
       localStorage.setItem("trainerToken", res.data.token);
       localStorage.setItem("trainer", JSON.stringify(res.data));
       navigate("/trainer/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed.");
+      setError(
+        err.response?.data?.message ||
+          "Login failed. Please check your credentials."
+      );
       setLoading(false);
     }
   };

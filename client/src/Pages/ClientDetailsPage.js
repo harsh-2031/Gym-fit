@@ -11,6 +11,9 @@ const ClientDetailsPage = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  // Define the API URL from the environment variable
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -18,11 +21,10 @@ const ClientDetailsPage = () => {
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
         const [clientRes, templatesRes] = await Promise.all([
-          axios.get(
-            `http://localhost:5000/api/trainers/clients/${clientId}`,
-            config
-          ),
-          axios.get("http://localhost:5000/api/trainers/workouts", config),
+          // --- UPDATED URL ---
+          axios.get(`${API_URL}/api/trainers/clients/${clientId}`, config),
+          // --- UPDATED URL ---
+          axios.get(`${API_URL}/api/trainers/workouts`, config),
         ]);
 
         setClient(clientRes.data);
@@ -34,7 +36,7 @@ const ClientDetailsPage = () => {
       }
     };
     fetchData();
-  }, [clientId]);
+  }, [clientId, API_URL]);
 
   const handleAssignWorkout = async (e) => {
     e.preventDefault();
@@ -49,8 +51,9 @@ const ClientDetailsPage = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const body = { workoutId: selectedTemplate };
 
+      // --- UPDATED URL ---
       await axios.post(
-        `http://localhost:5000/api/trainers/clients/${clientId}/assign-workout`,
+        `${API_URL}/api/trainers/clients/${clientId}/assign-workout`,
         body,
         config
       );

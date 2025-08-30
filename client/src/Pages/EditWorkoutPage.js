@@ -15,13 +15,17 @@ const EditWorkoutPage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchWorkoutData = async () => {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // --- UPDATED URL ---
         const { data } = await axios.get(
-          `http://localhost:5000/api/workouts/${id}`,
+          `${API_URL}/api/workouts/${id}`,
           config
         );
 
@@ -42,11 +46,12 @@ const EditWorkoutPage = () => {
       }
     };
     fetchWorkoutData();
-  }, [id]);
+  }, [id, API_URL]);
 
   useEffect(() => {
     const fetchAllExercises = async () => {
-      let url = "http://localhost:5000/api/exercises";
+      // --- UPDATED URL ---
+      let url = `${API_URL}/api/exercises`;
       if (muscleGroupFilter) {
         url += `?muscleGroup=${muscleGroupFilter}`;
       }
@@ -54,7 +59,7 @@ const EditWorkoutPage = () => {
       setAllExercises(data);
     };
     fetchAllExercises();
-  }, [muscleGroupFilter]);
+  }, [muscleGroupFilter, API_URL]);
 
   const handleAddExercise = () => {
     if (!selectedExercise || !sets || !reps) return;
@@ -91,11 +96,8 @@ const EditWorkoutPage = () => {
           reps,
         })),
       };
-      await axios.put(
-        `http://localhost:5000/api/workouts/${id}`,
-        workoutData,
-        config
-      );
+      // --- UPDATED URL ---
+      await axios.put(`${API_URL}/api/workouts/${id}`, workoutData, config);
       navigate("/workouts");
     } catch (error) {
       console.error("Failed to update workout", error);
@@ -103,14 +105,14 @@ const EditWorkoutPage = () => {
   };
 
   const bodyParts = [
-    "Chest",
-    "Back",
-    "Legs",
-    "Shoulders",
     "Biceps",
     "Triceps",
-    "Core",
+    "Back",
+    "Chest",
+    "Shoulders",
     "Forearms",
+    "Legs",
+    "Core",
   ];
   const inputClasses =
     "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
@@ -261,7 +263,7 @@ const EditWorkoutPage = () => {
                     >
                       <path
                         fillRule="evenodd"
-                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z"
+                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h--3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z"
                         clipRule="evenodd"
                       />
                     </svg>

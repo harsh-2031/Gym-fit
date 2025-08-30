@@ -8,15 +8,16 @@ const WorkoutsPage = () => {
   const [menuOpen, setMenuOpen] = useState(null);
   const menuRef = useRef(null);
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get(
-          "http://localhost:5000/api/workouts",
-          config
-        );
+        // --- UPDATED URL ---
+        const { data } = await axios.get(`${API_URL}/api/workouts`, config);
         setWorkouts(data);
       } catch (error) {
         console.error("Failed to fetch workouts", error);
@@ -25,7 +26,7 @@ const WorkoutsPage = () => {
       }
     };
     fetchWorkouts();
-  }, []);
+  }, [API_URL]); // Added API_URL to dependency array
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -45,10 +46,8 @@ const WorkoutsPage = () => {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        await axios.delete(
-          `http://localhost:5000/api/workouts/${workoutId}`,
-          config
-        );
+        // --- UPDATED URL ---
+        await axios.delete(`${API_URL}/api/workouts/${workoutId}`, config);
         setWorkouts(workouts.filter((workout) => workout._id !== workoutId));
       } catch (error) {
         console.error("Failed to delete workout", error);
@@ -89,6 +88,7 @@ const WorkoutsPage = () => {
                     {workout.description || "No description"}
                   </p>
                 </div>
+
                 <div className="flex items-center space-x-2">
                   <Link
                     to={`/workout/${workout._id}`}
@@ -96,6 +96,7 @@ const WorkoutsPage = () => {
                   >
                     Start
                   </Link>
+
                   <div
                     className="relative"
                     ref={menuOpen === workout._id ? menuRef : null}
@@ -117,6 +118,7 @@ const WorkoutsPage = () => {
                         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                       </svg>
                     </button>
+
                     {menuOpen === workout._id && (
                       <div className="absolute right-0 mt-2 w-48 bg-bg-paper rounded-md shadow-lg py-1 z-10 border border-gray-700">
                         <Link

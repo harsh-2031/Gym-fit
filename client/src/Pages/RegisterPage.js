@@ -13,6 +13,9 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const { name, email, password } = formData;
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -21,7 +24,8 @@ const RegisterPage = () => {
     setLoading(true);
     setError("");
     try {
-      await axios.post("http://localhost:5000/api/users/register", formData);
+      // --- UPDATED URL ---
+      await axios.post(`${API_URL}/api/users/register`, formData);
       alert("Registration successful! Please log in.");
       navigate("/login");
     } catch (err) {

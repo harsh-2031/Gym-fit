@@ -27,7 +27,9 @@ const LiveWorkoutPage = () => {
   const [duration, setDuration] = useState(0);
   const [timerActive, setTimerActive] = useState(true);
 
-  // Timer and Data Fetching logic remains the same...
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     let interval = null;
     if (timerActive) {
@@ -43,8 +45,9 @@ const LiveWorkoutPage = () => {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // --- UPDATED URL ---
         const { data } = await axios.get(
-          `http://localhost:5000/api/workouts/${id}`,
+          `${API_URL}/api/workouts/${id}`,
           config
         );
         setWorkoutPlan(data);
@@ -63,7 +66,7 @@ const LiveWorkoutPage = () => {
       }
     };
     fetchWorkoutPlan();
-  }, [id]);
+  }, [id, API_URL]); // Added API_URL to dependency array
 
   const handleSetChange = (exerciseIndex, setIndex, field, value) => {
     const updatedPerformance = [...performedExercises];
@@ -89,11 +92,8 @@ const LiveWorkoutPage = () => {
             })),
         })),
       };
-      await axios.post(
-        "http://localhost:5000/api/sessions",
-        sessionData,
-        config
-      );
+      // --- UPDATED URL ---
+      await axios.post(`${API_URL}/api/sessions`, sessionData, config);
       alert("Workout session saved successfully!");
       navigate("/history");
     } catch (error) {
@@ -116,7 +116,7 @@ const LiveWorkoutPage = () => {
     "w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-secondary bg-primary hover:bg-primary/80";
 
   if (loading || !workoutPlan) {
-    return <p>Loading workout...</p>;
+    return <p className="text-center mt-8">Loading workout...</p>;
   }
 
   return (

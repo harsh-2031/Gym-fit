@@ -15,13 +15,17 @@ const TrainerProfilePage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("trainerToken");
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // --- UPDATED URL ---
         const { data } = await axios.get(
-          "http://localhost:5000/api/trainers/profile/stats",
+          `${API_URL}/api/trainers/profile/stats`,
           config
         );
         setStats(data);
@@ -37,7 +41,7 @@ const TrainerProfilePage = () => {
     } else {
       setLoading(false);
     }
-  }, [trainer]);
+  }, [API_URL, trainer]); // Added API_URL to dependency array
 
   if (loading) return <p className="text-center mt-8">Loading Profile...</p>;
 

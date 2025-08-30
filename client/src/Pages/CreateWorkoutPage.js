@@ -13,12 +13,18 @@ const CreateWorkoutPage = () => {
   const [reps, setReps] = useState("");
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("token") || localStorage.getItem("trainerToken");
+  const isTrainer = !!localStorage.getItem("trainerToken");
+
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchAllExercises = async () => {
       try {
-        let url = "http://localhost:5000/api/exercises";
+        // --- UPDATED URL ---
+        let url = `${API_URL}/api/exercises`;
         if (muscleGroupFilter) {
           url += `?muscleGroup=${muscleGroupFilter}`;
         }
@@ -29,7 +35,7 @@ const CreateWorkoutPage = () => {
       }
     };
     fetchAllExercises();
-  }, [muscleGroupFilter]);
+  }, [muscleGroupFilter, API_URL]); // Added API_URL to dependency array
 
   const handleAddExercise = () => {
     if (!selectedExercise || !sets || !reps) {
@@ -68,12 +74,14 @@ const CreateWorkoutPage = () => {
           reps,
         })),
       };
-      await axios.post(
-        "http://localhost:5000/api/workouts",
-        workoutData,
-        config
-      );
-      navigate("/workouts");
+      // --- UPDATED URL ---
+      const postUrl = isTrainer
+        ? `${API_URL}/api/trainers/workouts`
+        : `${API_URL}/api/workouts`;
+
+      await axios.post(postUrl, workoutData, config);
+
+      navigate(isTrainer ? "/trainer/workouts" : "/workouts");
     } catch (error) {
       console.error("Failed to create workout", error);
     }
@@ -89,17 +97,17 @@ const CreateWorkoutPage = () => {
     "Legs",
     "Core",
   ];
+
   const inputClasses =
     "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
-  const buttonClasses =
-    "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-secondary bg-primary hover:bg-primary/80";
+  const buttonClasses = `w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-secondary bg-primary hover:bg-primary/80`;
   const outlinedButtonClasses =
     "w-full h-full flex justify-center py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-text-secondary bg-bg-paper hover:bg-secondary/20";
 
   return (
     <div className="bg-bg-paper shadow-lg rounded-lg p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-text-primary">
-        Create New Workout Plan
+        Create New Workout {isTrainer ? "Template" : "Plan"}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
@@ -250,7 +258,7 @@ const CreateWorkoutPage = () => {
         )}
         <div>
           <button type="submit" className={buttonClasses}>
-            Save Plan
+            Save {isTrainer ? "Template" : "Plan"}
           </button>
         </div>
       </form>

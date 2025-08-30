@@ -15,13 +15,17 @@ const TrainerEditWorkoutPage = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchWorkoutData = async () => {
       try {
         const token = localStorage.getItem("trainerToken");
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // --- UPDATED URL ---
         const { data } = await axios.get(
-          `http://localhost:5000/api/trainers/workouts/${id}`,
+          `${API_URL}/api/trainers/workouts/${id}`,
           config
         );
 
@@ -36,9 +40,8 @@ const TrainerEditWorkoutPage = () => {
           }))
         );
 
-        const exercisesRes = await axios.get(
-          "http://localhost:5000/api/exercises"
-        );
+        // --- UPDATED URL ---
+        const exercisesRes = await axios.get(`${API_URL}/api/exercises`);
         setAllExercises(exercisesRes.data);
         setLoading(false);
       } catch (error) {
@@ -47,11 +50,12 @@ const TrainerEditWorkoutPage = () => {
       }
     };
     fetchWorkoutData();
-  }, [id]);
+  }, [id, API_URL]);
 
   useEffect(() => {
     const fetchAllExercises = async () => {
-      let url = "http://localhost:5000/api/exercises";
+      // --- UPDATED URL ---
+      let url = `${API_URL}/api/exercises`;
       if (muscleGroupFilter) {
         url += `?muscleGroup=${muscleGroupFilter}`;
       }
@@ -59,7 +63,7 @@ const TrainerEditWorkoutPage = () => {
       setAllExercises(data);
     };
     fetchAllExercises();
-  }, [muscleGroupFilter]);
+  }, [muscleGroupFilter, API_URL]);
 
   const handleAddExercise = () => {
     if (!selectedExercise || !sets || !reps) return;
@@ -96,8 +100,9 @@ const TrainerEditWorkoutPage = () => {
           reps,
         })),
       };
+      // --- UPDATED URL ---
       await axios.put(
-        `http://localhost:5000/api/trainers/workouts/${id}`,
+        `${API_URL}/api/trainers/workouts/${id}`,
         workoutData,
         config
       );

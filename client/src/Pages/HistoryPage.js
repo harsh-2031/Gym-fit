@@ -5,15 +5,16 @@ const HistoryPage = () => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Define the API URL from the environment variable
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchSessions = async () => {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        const { data } = await axios.get(
-          "http://localhost:5000/api/sessions",
-          config
-        );
+        // --- UPDATED URL ---
+        const { data } = await axios.get(`${API_URL}/api/sessions`, config);
         setSessions(data);
       } catch (error) {
         console.error("Failed to fetch workout sessions", error);
@@ -22,7 +23,7 @@ const HistoryPage = () => {
       }
     };
     fetchSessions();
-  }, []);
+  }, [API_URL]); // Added API_URL to dependency array
 
   if (loading) {
     return <p className="text-center mt-8">Loading history...</p>;
@@ -35,6 +36,7 @@ const HistoryPage = () => {
           Workout History
         </h1>
       </div>
+
       <div className="space-y-4">
         {sessions.length > 0 ? (
           sessions.map((session) => (
@@ -68,6 +70,7 @@ const HistoryPage = () => {
                   </svg>
                 </div>
               </summary>
+
               <div className="px-5 pb-5 border-t border-gray-700">
                 <div className="mt-4 text-sm text-text-primary space-y-2">
                   {session.duration && (

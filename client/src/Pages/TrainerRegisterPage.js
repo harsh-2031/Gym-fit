@@ -13,6 +13,9 @@ const TrainerRegisterPage = () => {
   const navigate = useNavigate();
   const { name, email, password } = formData;
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -22,7 +25,8 @@ const TrainerRegisterPage = () => {
     setLoading(true);
     setError("");
     try {
-      await axios.post("http://localhost:5000/api/trainers/register", formData);
+      // --- UPDATED URL ---
+      await axios.post(`${API_URL}/api/trainers/register`, formData);
       alert("Registration successful! Please log in.");
       navigate("/trainer/login");
     } catch (err) {

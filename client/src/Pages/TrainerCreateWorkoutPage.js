@@ -13,10 +13,14 @@ const TrainerCreateWorkoutPage = () => {
   const [reps, setReps] = useState("");
   const navigate = useNavigate();
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchAllExercises = async () => {
       try {
-        let url = "http://localhost:5000/api/exercises";
+        // --- UPDATED URL ---
+        let url = `${API_URL}/api/exercises`;
         if (muscleGroupFilter) {
           url += `?muscleGroup=${muscleGroupFilter}`;
         }
@@ -27,7 +31,7 @@ const TrainerCreateWorkoutPage = () => {
       }
     };
     fetchAllExercises();
-  }, [muscleGroupFilter]);
+  }, [muscleGroupFilter, API_URL]); // Added API_URL to dependency array
 
   const handleAddExercise = () => {
     if (!selectedExercise || !sets || !reps) {
@@ -67,11 +71,8 @@ const TrainerCreateWorkoutPage = () => {
           reps,
         })),
       };
-      await axios.post(
-        "http://localhost:5000/api/trainers/workouts",
-        workoutData,
-        config
-      );
+      // --- UPDATED URL ---
+      await axios.post(`${API_URL}/api/trainers/workouts`, workoutData, config);
       navigate("/trainer/workouts");
     } catch (error) {
       console.error("Failed to create workout template", error);

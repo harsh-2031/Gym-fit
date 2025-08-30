@@ -14,6 +14,12 @@ const trainerRoutes = require("./routes/trainer.routes");
 const app = express();
 const port = process.env.PORT || 5000;
 
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? "YOUR_FRONTEND_URL_GOES_HERE" // We will get this from Vercel later
+      : "http://localhost:3000",
+};
 // --- 2. MIDDLEWARE ---
 app.use(cors());
 app.use(express.json()); // To parse JSON bodies

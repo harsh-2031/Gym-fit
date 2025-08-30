@@ -10,12 +10,16 @@ const TrainerDashboardPage = () => {
   const [message, setMessage] = useState("");
   const trainerInfo = JSON.parse(localStorage.getItem("trainer"));
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const fetchClients = async () => {
     try {
       const token = localStorage.getItem("trainerToken");
       const config = { headers: { Authorization: `Bearer ${token}` } };
+      // --- UPDATED URL ---
       const { data } = await axios.get(
-        "http://localhost:5000/api/trainers/clients",
+        `${API_URL}/api/trainers/clients`,
         config
       );
       setClients(data);
@@ -28,6 +32,7 @@ const TrainerDashboardPage = () => {
 
   useEffect(() => {
     fetchClients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleAddClient = async (e) => {
@@ -37,8 +42,9 @@ const TrainerDashboardPage = () => {
     try {
       const token = localStorage.getItem("trainerToken");
       const config = { headers: { Authorization: `Bearer ${token}` } };
+      // --- UPDATED URL ---
       await axios.post(
-        "http://localhost:5000/api/trainers/clients",
+        `${API_URL}/api/trainers/clients`,
         { clientEmail },
         config
       );
@@ -53,7 +59,6 @@ const TrainerDashboardPage = () => {
 
   if (loading) return <p className="text-center mt-8">Loading Dashboard...</p>;
 
-  // --- UPDATED to use theme colors ---
   const cardClasses = "bg-bg-paper rounded-lg shadow-lg p-6 flex flex-col";
   const inputClasses =
     "w-full px-3 py-2 border border-gray-700 bg-bg-default rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary text-text-primary";
@@ -78,7 +83,6 @@ const TrainerDashboardPage = () => {
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
         style={{ alignItems: "start" }}
       >
-        {/* Add Client Card */}
         <div className={cardClasses}>
           <h2 className="text-xl font-bold mb-4 text-text-primary">
             Add New Client
@@ -108,7 +112,6 @@ const TrainerDashboardPage = () => {
           )}
         </div>
 
-        {/* Clients List Card */}
         <div className={cardClasses}>
           <h2 className="text-xl font-bold mb-4 text-text-primary">
             My Clients

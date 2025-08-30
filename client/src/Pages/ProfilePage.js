@@ -3,12 +3,10 @@ import axios from "axios";
 
 // A reusable card component for displaying stats
 const StatCard = ({ title, value, icon }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center">
-    <div className="text-4xl text-indigo-500 dark:text-indigo-400 mb-2">
-      {icon}
-    </div>
-    <p className="text-3xl font-bold text-gray-900 dark:text-white">{value}</p>
-    <p className="text-gray-500 dark:text-gray-400">{title}</p>
+  <div className="bg-bg-paper rounded-lg shadow-lg p-6 text-center">
+    <div className="text-4xl text-primary mb-2">{icon}</div>
+    <p className="text-3xl font-bold text-text-primary">{value}</p>
+    <p className="text-text-secondary">{title}</p>
   </div>
 );
 
@@ -17,13 +15,17 @@ const ProfilePage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Define the API URL from the environment variable
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const token = localStorage.getItem("token");
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // --- UPDATED URL ---
         const { data } = await axios.get(
-          "http://localhost:5000/api/users/profile",
+          `${API_URL}/api/users/profile`,
           config
         );
         setProfile(data.profile);
@@ -35,17 +37,17 @@ const ProfilePage = () => {
       }
     };
     fetchProfileData();
-  }, []);
+  }, [API_URL]); // Added API_URL to dependency array
 
-  if (loading) return <p>Loading profile...</p>;
+  if (loading) return <p className="text-center mt-8">Loading profile...</p>;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-4xl font-bold text-text-primary">
           My Profile & Progress
         </h1>
-        <p className="text-lg text-gray-500 dark:text-gray-400">
+        <p className="text-lg text-text-secondary">
           Here's a look at your journey so far.
         </p>
       </div>
@@ -70,9 +72,11 @@ const ProfilePage = () => {
       </div>
 
       {/* Profile Details Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold mb-4">Your Details</h2>
-        <div className="space-y-3">
+      <div className="bg-bg-paper rounded-lg shadow-lg p-6">
+        <h2 className="text-2xl font-bold mb-4 text-text-primary">
+          Your Details
+        </h2>
+        <div className="space-y-3 text-text-primary">
           <p>
             <strong>Name:</strong> {profile?.name}
           </p>
@@ -94,7 +98,6 @@ const ProfilePage = () => {
             <strong>Goal:</strong> {profile?.goal || "Not set"}
           </p>
         </div>
-        {/* In the future, an "Edit" button here could turn these into a form */}
       </div>
     </div>
   );

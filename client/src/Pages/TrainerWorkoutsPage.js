@@ -8,13 +8,17 @@ const TrainerWorkoutsPage = () => {
   const [menuOpen, setMenuOpen] = useState(null);
   const menuRef = useRef(null);
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
         const token = localStorage.getItem("trainerToken");
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // --- UPDATED URL ---
         const { data } = await axios.get(
-          "http://localhost:5000/api/trainers/workouts",
+          `${API_URL}/api/trainers/workouts`,
           config
         );
         setWorkouts(data);
@@ -25,7 +29,7 @@ const TrainerWorkoutsPage = () => {
       }
     };
     fetchWorkouts();
-  }, []);
+  }, [API_URL]); // Added API_URL to dependency array
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -45,8 +49,9 @@ const TrainerWorkoutsPage = () => {
       try {
         const token = localStorage.getItem("trainerToken");
         const config = { headers: { Authorization: `Bearer ${token}` } };
+        // --- UPDATED URL ---
         await axios.delete(
-          `http://localhost:5000/api/trainers/workouts/${workoutId}`,
+          `${API_URL}/api/trainers/workouts/${workoutId}`,
           config
         );
         setWorkouts(workouts.filter((w) => w._id !== workoutId));

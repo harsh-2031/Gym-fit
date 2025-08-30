@@ -11,6 +11,9 @@ const OnboardingPage = () => {
   });
   const navigate = useNavigate();
 
+  // --- Define the API URL from the environment variable ---
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -19,11 +22,8 @@ const OnboardingPage = () => {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.put(
-        "http://localhost:5000/api/users/details",
-        formData,
-        config
-      );
+      // --- UPDATED URL ---
+      await axios.put(`${API_URL}/api/users/details`, formData, config);
 
       const user = JSON.parse(localStorage.getItem("user"));
       user.hasCompletedOnboarding = true;
